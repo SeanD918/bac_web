@@ -3,6 +3,6 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "vercel-backend/index.js" },
     { "source": "/uploads/(.*)", "destination": "vercel-backend/index.js" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
