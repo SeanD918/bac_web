@@ -1,8 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "installCommand": "npm install",
   "outputDirectory": "dist",
-  "cleanUrls": true,
   "functions": {
     "vercel-backend/index.js": {
       "includeFiles": "server/**"
