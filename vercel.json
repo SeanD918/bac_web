@@ -1,15 +1,20 @@
 {
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "functions": {
-    "vercel-backend/index.js": {
-      "includeFiles": "server/**"
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    },
+    {
+      "src": "vercel-backend/index.js",
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["server/**"] }
     }
-  },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "vercel-backend/index.js" },
-    { "source": "/uploads/(.*)", "destination": "vercel-backend/index.js" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "vercel-backend/index.js" },
+    { "src": "/uploads/(.*)", "dest": "vercel-backend/index.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
