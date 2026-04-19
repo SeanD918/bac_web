@@ -1,19 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "vercel-backend/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["server/**"]
-      }
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
   "rewrites": [
     { "source": "/api/(.*)", "destination": "vercel-backend/index.js" },
     { "source": "/uploads/(.*)", "destination": "vercel-backend/index.js" },
