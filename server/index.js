@@ -22,9 +22,15 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
+// Mount both with and without /api prefix for maximum compatibility on Vercel
 app.use('/api', examRoutes);
 app.use('/api', uploadRoutes);
 app.use('/api', chatRoutes);
+
+// Fallback for direct function calls
+app.use(examRoutes);
+app.use(uploadRoutes);
+app.use(chatRoutes);
 
 // API 404 handler
 app.use('/api', (req, res) => {
