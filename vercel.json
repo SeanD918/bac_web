@@ -15,6 +15,7 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "vercel-backend/index.js" },
     { "src": "/uploads/(.*)", "dest": "vercel-backend/index.js" },
+    { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
