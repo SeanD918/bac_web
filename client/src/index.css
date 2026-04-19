@@ -1,0 +1,214 @@
+/* ─── BacWeb Global CSS ─────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:            #080b14;
+  --bg-card:       #0e1221;
+  --bg-card2:      #111827;
+  --bg-glass:      rgba(255,255,255,0.04);
+  --bg-glass2:     rgba(255,255,255,0.07);
+  --border:        rgba(255,255,255,0.08);
+  --border-hover:  rgba(255,255,255,0.16);
+
+  --text:          #e2e8f0;
+  --text-muted:    #94a3b8;
+  --text-faint:    #475569;
+
+  --accent:        #6366f1;
+  --accent-glow:   rgba(99,102,241,0.3);
+  --accent2:       #8b5cf6;
+  --accent-grad:   linear-gradient(135deg, #6366f1, #8b5cf6);
+
+  --green:  #10b981;
+  --yellow: #f59e0b;
+  --blue:   #3b82f6;
+  --pink:   #ec4899;
+  --red:    #ef4444;
+
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 48px rgba(0,0,0,0.5);
+  --glow:      0 0 40px rgba(99,102,241,0.15);
+
+  --font:         'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', system-ui, sans-serif;
+
+  --nav-h: 68px;
+  --sidebar-w: 280px;
+
+  --transition: 0.2s ease;
+  --transition-slow: 0.4s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+a { text-decoration: none; color: inherit; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ─── Utility ───────────────────────────────────────────────────── */
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+}
+
+.gradient-text {
+  background: var(--accent-grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-principale { background: rgba(99,102,241,0.15); color: #818cf8; }
+.badge-controle   { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.badge-pratique   { background: rgba(16,185,129,0.15); color: #34d399; }
+
+/* ─── Animations ────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.2); }
+  50%       { box-shadow: 0 0 40px rgba(99,102,241,0.5); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-up  { animation: fadeUp 0.5s ease forwards; }
+.animate-fade-in  { animation: fadeIn 0.4s ease forwards; }
+
+/* ─── Skeleton Loader ───────────────────────────────────────────── */
+
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--bg-card2) 25%,
+    rgba(255,255,255,0.05) 50%,
+    var(--bg-card2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Spinner ───────────────────────────────────────────────────── */
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto;
+}
+
+/* ─── Glassmorphism Card ────────────────────────────────────────── */
+
+.glass {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ─── Section pills ─────────────────────────────────────────────── */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: all var(--transition);
+  cursor: pointer;
+}

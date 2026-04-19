@@ -1,0 +1,27 @@
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+dist/
+
+# Uploads (local only — Vercel is read-only)
+server/uploads/
+
+# Local-only convenience files (not needed on Vercel)
+client/package.json
+client/package-lock.json
+
+# Environment variables
+client/.env
+client/.env.*
+!client/.env.production
+server/.env
+.env
+.env.production
+.vercel
+
+# Other
+.DS_Store
+*.log
+scratch/
