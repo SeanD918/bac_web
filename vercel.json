@@ -1,12 +1,5 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
   "cleanUrls": true,
-  "functions": {
-    "vercel-backend/index.js": {
-      "runtime": "vercel-node@latest"
-    }
-  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "vercel-backend/index.js" },
     { "source": "/uploads/(.*)", "destination": "vercel-backend/index.js" },
