@@ -5,7 +5,7 @@ import axios from 'axios'
 import ExamCard from '../components/ExamCard'
 import { SECTIONS as STATIC_SECTIONS } from '../data/constants'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API = import.meta.env.VITE_API_URL || '/api'
 
 export default function HomePage() {
   const [stats, setStats]       = useState(null)

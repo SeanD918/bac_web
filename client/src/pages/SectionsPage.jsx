@@ -4,7 +4,7 @@ import { FileText, ChevronRight, Search } from 'lucide-react'
 import axios from 'axios'
 import { SECTIONS as STATIC_SECTIONS } from '../data/constants'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API = import.meta.env.VITE_API_URL || '/api'
 
 export default function SectionsPage() {
   const [sections, setSections] = useState(STATIC_SECTIONS)

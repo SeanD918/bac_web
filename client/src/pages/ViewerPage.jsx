@@ -4,7 +4,7 @@ import { ChevronLeft, Download, ExternalLink, Printer, Info, FileText, CheckCirc
 import axios from 'axios';
 import './ViewerPage.css';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API = import.meta.env.VITE_API_URL || '/api';
 
 const ViewerPage = () => {
   const { id } = useParams();

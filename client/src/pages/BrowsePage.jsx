@@ -4,7 +4,7 @@ import { Search, Filter, X, FileText, BookOpen, ChevronLeft, ChevronRight, Rotat
 import axios from 'axios'
 import { SECTIONS as STATIC_SECTIONS, SUBJECTS as STATIC_SUBJECTS } from '../data/constants'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API = import.meta.env.VITE_API_URL || '/api'
 
 const YEARS = Array.from({ length: 2024 - 1994 + 1 }, (_, i) => 2024 - i)
 const TYPES = ['Principale', 'Contrôle', 'Pratique']

@@ -3,7 +3,7 @@ import axios from 'axios'
 import { UploadCloud, Trash2, ShieldCheck, Lock, AlertCircle, CheckCircle, FileText, Calendar, Tag } from 'lucide-react'
 import { SECTIONS, SUBJECTS, EXAM_TYPES } from '../data/constants'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const API = import.meta.env.VITE_API_URL || '/api'
 
 export default function AdminPage() {
   const [token, setToken] = useState(localStorage.getItem('bacweb_admin_token') || '')
