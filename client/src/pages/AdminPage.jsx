@@ -20,12 +20,19 @@ export default function AdminPage() {
   const [myUploads, setMyUploads] = useState([])
   const [fetching, setFetching] = useState(false)
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    if (password) {
+    if (!password) return
+    
+    try {
+      await axios.post(`${API}/admin/verify`, {}, {
+        headers: { 'x-admin-token': password }
+      })
       localStorage.setItem('bacweb_admin_token', password)
       setToken(password)
       setIsLogged(true)
+    } catch (err) {
+      alert('Mot de passe incorrect ou erreur réseau.')
     }
   }
 
@@ -39,7 +46,9 @@ export default function AdminPage() {
     if (!token) return
     setFetching(true)
     try {
-      const r = await axios.get(`${API}/admin/items`)
+      const r = await axios.get(`${API}/admin/items`, {
+        headers: { 'x-admin-token': token }
+      })
       setMyUploads(r.data.results)
     } catch (err) {
       console.error(err)

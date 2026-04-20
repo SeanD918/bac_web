@@ -103,9 +103,14 @@ router.post(
 );
 
 // GET /api/admin/items
-router.get('/admin/items', (_req, res) => {
+router.get('/admin/items', auth, (_req, res) => {
   const db = loadDB();
   res.json({ total: db.length, results: db });
+});
+
+// POST /api/admin/verify
+router.post('/admin/verify', auth, (_req, res) => {
+  res.json({ success: true });
 });
 
 // DELETE /api/admin/items/:id
