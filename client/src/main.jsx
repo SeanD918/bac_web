@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 
-console.log('BacWeb application mounting... [Build: 15:52]');
+console.log('BacWeb application mounting... [Build: 22:20 - Security Update]');
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
