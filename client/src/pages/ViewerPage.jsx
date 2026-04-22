@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeft, Download, ExternalLink, Printer, Info, FileText, CheckCircle } from 'lucide-react';
 import axios from 'axios';
+import API from '../config/api';
 import './ViewerPage.css';
-
-const API = import.meta.env.VITE_API_URL || '/api';
 
 const ViewerPage = () => {
   const { id } = useParams();

@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, BookOpen, FileText, ChevronRight, Sparkles } from 'lucide-react'
 import axios from 'axios'
+import API from '../config/api'
 import ExamCard from '../components/ExamCard'
 import { SECTIONS as STATIC_SECTIONS } from '../data/constants'
-
-const API = import.meta.env.VITE_API_URL || '/api'
-console.log('[BacWeb] API URL:', API);
 
 export default function HomePage() {
   const [stats, setStats]       = useState(null)

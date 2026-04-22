@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { ChevronLeft, FileText, BookOpen, Filter } from 'lucide-react'
 import axios from 'axios'
+import API from '../config/api'
 import { SECTIONS as STATIC_SECTIONS, SUBJECTS as STATIC_SUBJECTS } from '../data/constants'
 
-const API = import.meta.env.VITE_API_URL || '/api'
 const YEARS = Array.from({ length: 2024 - 1994 + 1 }, (_, i) => 2024 - i)
 const TYPES = ['Principale', 'Contrôle', 'Pratique']
 

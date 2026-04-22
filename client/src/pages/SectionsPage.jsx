@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FileText, ChevronRight, Search } from 'lucide-react'
 import axios from 'axios'
+import API from '../config/api'
 import { SECTIONS as STATIC_SECTIONS } from '../data/constants'
-
-const API = import.meta.env.VITE_API_URL || '/api'
 
 export default function SectionsPage() {
   const [sections, setSections] = useState(STATIC_SECTIONS)
