@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DB_FILE = path.join(__dirname, '..', 'uploaded_exams.json');
+const DB_FILE = path.join(process.cwd(), 'server', 'uploaded_exams.json');
 
 function loadDB() {
   try {
@@ -10,7 +10,7 @@ function loadDB() {
   } catch (err) {
     try {
       // Fallback to absolute path if require fails
-      const data = fs.readFileSync(DB_FILE, 'utf8');
+      const data = fs.readFileSync(path.join(process.cwd(), 'server', 'uploaded_exams.json'), 'utf8');
       return JSON.parse(data);
     } catch (fsErr) {
       console.error('Error loading DB file:', fsErr.message);
@@ -33,3 +33,4 @@ function saveDB(data) {
 }
 
 module.exports = { loadDB, saveDB };
+
