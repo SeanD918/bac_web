@@ -23,14 +23,22 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
-  const db = require('./db/store');
-  const count = db.loadDB().length;
-  res.json({ 
-    status: 'ok', 
-    count,
-    environment: process.env.NODE_ENV, 
-    vercel: process.env.VERCEL 
-  });
+  try {
+    const db = require('./db/store');
+    const count = db.loadDB().length;
+    res.json({ 
+      status: 'ok', 
+      count,
+      environment: process.env.NODE_ENV, 
+      vercel: process.env.VERCEL 
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      status: 'error', 
+      message: err.message, 
+      stack: err.stack 
+    });
+  }
 });
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
