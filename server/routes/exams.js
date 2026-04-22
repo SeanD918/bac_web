@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { SECTIONS, SUBJECTS, EXAM_TYPES } = require('../data/constants');
 const { loadDB } = require('../db/store');
+const axios = require('axios');
 
 // ─── Mock Data Generation ─────────────────────────────────────────────────────
 
@@ -134,7 +135,6 @@ router.get('/proxy-pdf', async (req, res) => {
   if (!url) return res.status(400).send('URL is required');
 
   try {
-    const axios = require('axios');
     const response = await axios({
       method: 'get',
       url: url,

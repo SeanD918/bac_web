@@ -58,7 +58,7 @@ app.use((err, _req, res, _next) => {
 });
 
 // ─── Server Start ────────────────────────────────────────────────────────────
-if (require.main === module) {
+if (require.main === module && !process.env.VERCEL) {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
     console.log(`BacWeb Server running on http://localhost:${PORT}`);
