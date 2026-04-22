@@ -22,7 +22,16 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
-app.get('/api/health', (req, res) => res.json({ status: 'ok', environment: process.env.NODE_ENV, vercel: process.env.VERCEL }));
+app.get('/api/health', (req, res) => {
+  const db = require('./db/store');
+  const count = db.loadDB().length;
+  res.json({ 
+    status: 'ok', 
+    count,
+    environment: process.env.NODE_ENV, 
+    vercel: process.env.VERCEL 
+  });
+});
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 // Mount both with and without /api prefix for maximum compatibility on Vercel
