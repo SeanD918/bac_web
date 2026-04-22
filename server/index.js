@@ -22,6 +22,9 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
+app.get('/api/health', (req, res) => res.json({ status: 'ok', environment: process.env.NODE_ENV, vercel: process.env.VERCEL }));
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
 // Mount both with and without /api prefix for maximum compatibility on Vercel
 app.use('/api', examRoutes);
 app.use('/api', uploadRoutes);
@@ -46,7 +49,7 @@ app.use((err, _req, res, _next) => {
 });
 
 // ─── Server Start ────────────────────────────────────────────────────────────
-if (process.env.VERCEL !== '1') {
+if (require.main === module) {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
     console.log(`BacWeb Server running on http://localhost:${PORT}`);

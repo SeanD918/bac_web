@@ -1,16 +1,21 @@
 const fs = require('fs');
 const path = require('path');
 
-const DB_FILE = path.join(__dirname, '..', 'uploaded_exams.json');
+const DB_FILE = path.join(process.cwd(), 'server', 'uploaded_exams.json');
 
 function loadDB() {
   try {
-    // Read directly from filesystem as require() can be cached or bundled oddly in Vercel
-    const data = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(data);
+    // Using require() is more reliable for bundling on Vercel and faster
+    return require('../uploaded_exams.json');
   } catch (err) {
-    console.error('Error loading DB file:', err.message);
-    return [];
+    try {
+      // Fallback to absolute path if require fails
+      const data = fs.readFileSync(path.join(process.cwd(), 'server', 'uploaded_exams.json'), 'utf8');
+      return JSON.parse(data);
+    } catch (fsErr) {
+      console.error('Error loading DB file:', fsErr.message);
+      return [];
+    }
   }
 }
 
