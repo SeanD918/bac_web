@@ -1,5 +1,4 @@
 {
-  "outputDirectory": "dist",
   "functions": {
     "api/index.js": {
       "includeFiles": "server/**"
@@ -8,6 +7,6 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.js" },
     { "source": "/uploads/(.*)", "destination": "/api/index.js" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!api|uploads).*)", "destination": "/index.html" }
   ]
 }

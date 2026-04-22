@@ -6,7 +6,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "npm install && vite build",
+    "build": "vite build",
+    "vercel-build": "npm install && vite build",
     "start": "node server/index.js",
     "dev": "concurrently \"nodemon server/index.js\" \"vite\""
   },
