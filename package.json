@@ -6,7 +6,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "npm install && vite build",
     "start": "node server/index.js",
     "dev": "concurrently \"nodemon server/index.js\" \"vite\""
   },
