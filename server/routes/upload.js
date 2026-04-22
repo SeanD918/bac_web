@@ -3,7 +3,7 @@ const router  = express.Router();
 const multer  = require('multer');
 const path    = require('path');
 const fs      = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const crypto  = require('crypto');
 const { SECTIONS }   = require('../data/constants');
 const { loadDB, saveDB } = require('../db/store');
 
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
   filename: (_req, file, cb) => {
     const ext  = path.extname(file.originalname);
     const name = path.basename(file.originalname, ext).replace(/\s+/g, '_');
-    cb(null, `${name}_${uuidv4().slice(0, 8)}${ext}`);
+    cb(null, `${name}_${crypto.randomUUID().slice(0, 8)}${ext}`);
   },
 });
 
@@ -80,7 +80,7 @@ router.post(
     const correctionUrl  = hasCorrection ? `/uploads/${correctionFile.filename}` : null;
 
     const record = {
-      id:             uuidv4(),
+      id:             crypto.randomUUID(),
       year:           parseInt(year),
       section,
       sectionLabel:   SECTIONS.find(s => s.id === section)?.label || section,
