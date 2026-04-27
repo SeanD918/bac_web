@@ -18,7 +18,9 @@ export default function MessagesPage() {
   const fileInputRef = useRef(null);
 
   const [targetUser, setTargetUser] = useState(null);
+  const [activeLightbox, setActiveLightbox] = useState(null); // { url, type }
   const messagesEndRef = useRef(null);
+
 
 
   useEffect(() => {
@@ -136,15 +138,22 @@ export default function MessagesPage() {
                 gap: 8
               }}>
                 {(m.media || (m.mediaUrl ? [{url: m.mediaUrl, type: m.mediaType, name: m.mediaName}] : [])).length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: m.content ? 8 : 0 }}>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: (m.media?.length || 1) === 1 ? '1fr' : 'repeat(auto-fit, minmax(100px, 1fr))',
+                    gap: 6, 
+                    marginBottom: m.content ? 8 : 0,
+                    borderRadius: 12,
+                    overflow: 'hidden'
+                  }}>
                     {(m.media || [{url: m.mediaUrl, type: m.mediaType, name: m.mediaName}]).map((file, idx) => (
-                      <div key={idx}>
+                      <div key={idx} style={{ cursor: file.type === 'image' ? 'zoom-in' : 'pointer' }}>
                         {file.type === 'image' ? (
                           <img 
                             src={file.url.startsWith('data:') ? file.url : `${API.replace('/api', '')}${file.url}`} 
                             alt="Shared media" 
-                            style={{ maxWidth: '100%', borderRadius: 8, cursor: 'pointer', border: isMe ? 'none' : '1px solid var(--border)' }}
-                            onClick={() => window.open(file.url.startsWith('data:') ? file.url : `${API.replace('/api', '')}${file.url}`, '_blank')}
+                            style={{ width: '100%', height: (m.media?.length || 1) > 1 ? '100px' : 'auto', objectFit: 'cover', display: 'block' }}
+                            onClick={() => setActiveLightbox(file)}
                           />
                         ) : (
                           <a 
@@ -155,22 +164,23 @@ export default function MessagesPage() {
                               display: 'flex', 
                               alignItems: 'center', 
                               gap: 10, 
-                              padding: '8px 12px', 
+                              padding: '10px 12px', 
                               background: isMe ? 'rgba(255,255,255,0.1)' : 'var(--surface-lowest)', 
-                              borderRadius: 8, 
                               textDecoration: 'none',
                               color: isMe ? 'white' : 'var(--text)',
-                              border: isMe ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--border)'
+                              border: isMe ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--border)',
+                              height: '100%'
                             }}
                           >
-                            <FileText size={24} color={isMe ? 'white' : '#ef4444'} />
-                            <span style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name || 'Document'}</span>
+                            <FileText size={20} color={isMe ? 'white' : '#ef4444'} />
+                            <span style={{ fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name || 'Doc'}</span>
                           </a>
                         )}
                       </div>
                     ))}
                   </div>
                 )}
+
 
                 {m.content && <div>{m.content}</div>}
               </div>
@@ -241,9 +251,32 @@ export default function MessagesPage() {
             </button>
           </form>
         </div>
-
-
       </div>
+
+      {/* Lightbox Modal */}
+      {activeLightbox && (
+        <div 
+          style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+            background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex',
+            alignItems: 'center', justifyContent: 'center', padding: 40
+          }}
+          onClick={() => setActiveLightbox(null)}
+        >
+          <button 
+            style={{ position: 'absolute', top: 30, right: 30, background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+            onClick={() => setActiveLightbox(null)}
+          >
+            <X size={32} />
+          </button>
+          <img 
+            src={activeLightbox.url.startsWith('data:') ? activeLightbox.url : `${API.replace('/api', '')}${activeLightbox.url}`} 
+            alt="Full size" 
+            style={{ maxWidth: '95%', maxHeight: '95%', borderRadius: 8, boxShadow: '0 0 40px rgba(0,0,0,0.5)' }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
