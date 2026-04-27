@@ -77,7 +77,7 @@ export default function CommunityPage() {
     }
 
     setSelectedFiles(validFiles);
-    
+
     const newPreviews = validFiles.map(file => {
       if (file.type.startsWith('image/')) {
         return { type: 'image', url: URL.createObjectURL(file) };
@@ -90,7 +90,7 @@ export default function CommunityPage() {
   const handlePostSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!newPost.trim() && selectedFiles.length === 0) return;
-    
+
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -102,7 +102,7 @@ export default function CommunityPage() {
       const res = await axios.post(`${API}/community/posts`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      
+
       setPosts([res.data, ...posts]);
       setNewPost('');
       setSelectedFiles([]);
@@ -238,14 +238,14 @@ export default function CommunityPage() {
   return (
     <div className="page-container" style={{ paddingTop: 100, paddingBottom: 80, display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: 700 }}>
-        
+
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <h1 style={{ fontFamily: 'var(--font-display)', background: 'var(--accent-grad)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', display: 'inline-block', marginBottom: 8 }}>
             Community Feed
           </h1>
           <p style={{ color: 'var(--text-muted)' }}>Share resources, ask questions, and connect with other students.</p>
         </div>
-        
+
         <div className="card" style={{ padding: 24, marginBottom: 32, display: 'flex', gap: 16 }}>
           <div style={{
             width: 40, height: 40, borderRadius: '50%', background: 'var(--accent-grad)',
@@ -255,7 +255,7 @@ export default function CommunityPage() {
             {user.username.charAt(0).toUpperCase()}
           </div>
           <form onSubmit={handlePostSubmit} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <textarea 
+            <textarea
               value={newPost}
               onChange={e => setNewPost(e.target.value)}
               onKeyDown={e => {
@@ -281,7 +281,7 @@ export default function CommunityPage() {
                     ) : (
                       <img src={prev.url} alt="Preview" style={{ width: '100px', height: '100px', borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border)' }} />
                     )}
-                    <button 
+                    <button
                       type="button"
                       onClick={() => {
                         const newFiles = [...selectedFiles];
@@ -302,16 +302,16 @@ export default function CommunityPage() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
               <div>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleFileChange} 
-                  accept="image/*,application/pdf" 
-                  style={{ display: 'none' }} 
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*,application/pdf"
+                  style={{ display: 'none' }}
                   multiple
                 />
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="btn btn-ghost"
                   style={{ color: 'var(--text-muted)', padding: '8px' }}
@@ -321,9 +321,9 @@ export default function CommunityPage() {
                   <span style={{ fontSize: 13 }}>Media</span>
                 </button>
               </div>
-              <button 
-                type="submit" 
-                className="btn btn-primary" 
+              <button
+                type="submit"
+                className="btn btn-primary"
                 disabled={isUploading || (!newPost.trim() && selectedFiles.length === 0)}
                 style={{ padding: '8px 24px' }}
               >
@@ -341,10 +341,10 @@ export default function CommunityPage() {
             const isMe = post.authorId === user.id;
 
             return (
-              <div 
-                key={post.id} 
+              <div
+                key={post.id}
                 ref={el => postRefs.current[post.id] = el}
-                className="card" 
+                className="card"
                 style={{ padding: '24px 24px 16px 24px', transition: 'box-shadow 0.5s ease' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
@@ -359,17 +359,17 @@ export default function CommunityPage() {
                     <div>
                       <div style={{ fontWeight: 'bold', fontSize: 15 }}>{post.authorName}</div>
                       <div style={{ color: 'var(--text-faint)', fontSize: 12 }}>
-                        {new Date(post.timestamp).toLocaleDateString()} at {new Date(post.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        {new Date(post.timestamp).toLocaleDateString()} at {new Date(post.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
                   </div>
-                  
+
                   {!isMe && (
                     <div style={{ display: 'flex', gap: 8 }}>
                       <Link to={`/messages/${post.authorId}`} className="btn btn-ghost" style={{ padding: '6px 12px', fontSize: 13 }}>
                         <MessageCircle size={14} /> Chat
                       </Link>
-                      <button 
+                      <button
                         onClick={() => followUser(post.authorId)}
                         className={`btn ${isFollowing ? 'btn-ghost' : 'btn-secondary'}`}
                         style={{ padding: '6px 12px', fontSize: 13 }}
@@ -385,32 +385,32 @@ export default function CommunityPage() {
                 </p>
 
                 {post.media && post.media.length > 0 && (
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: post.media.length === 1 ? '1fr' : post.media.length === 2 ? '1fr 1fr' : 'repeat(auto-fit, minmax(180px, 1fr))', 
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: post.media.length === 1 ? '1fr' : post.media.length === 2 ? '1fr 1fr' : 'repeat(auto-fit, minmax(180px, 1fr))',
                     gridAutoRows: post.media.length === 1 ? 'auto' : '200px',
-                    gap: 8, 
+                    gap: 8,
                     marginBottom: 20,
                     borderRadius: 16,
                     overflow: 'hidden'
                   }}>
                     {post.media.map((m, idx) => (
-                      <div key={idx} style={{ 
-                        position: 'relative', 
+                      <div key={idx} style={{
+                        position: 'relative',
                         height: '100%',
                         cursor: m.type === 'image' ? 'zoom-in' : 'pointer'
                       }}>
                         {m.type === 'image' ? (
-                          <img 
-                            src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
-                            alt={`Attachment ${idx + 1}`} 
+                          <img
+                            src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`}
+                            alt={`Attachment ${idx + 1}`}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onClick={() => setActiveLightbox(m)}
                           />
                         ) : (
-                          <a 
-                            href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
-                            target="_blank" 
+                          <a
+                            href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`}
+                            target="_blank"
                             rel="noopener noreferrer"
                             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, background: 'var(--surface-lowest)', textDecoration: 'none', height: '100%', border: '1px solid var(--border)' }}
                           >
@@ -428,14 +428,14 @@ export default function CommunityPage() {
 
 
 
-                
+
                 <div style={{ display: 'flex', gap: 16, marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
-                  <button 
+                  <button
                     onClick={() => handleLike(post.id)}
-                    className="btn btn-ghost" 
+                    className="btn btn-ghost"
                     style={{ color: post.likes.includes(user.id) ? '#ef4444' : 'var(--text-muted)', padding: '6px 12px' }}
                   >
-                    <Heart size={18} fill={post.likes.includes(user.id) ? '#ef4444' : 'none'} /> 
+                    <Heart size={18} fill={post.likes.includes(user.id) ? '#ef4444' : 'none'} />
                     {post.likes.length}
                   </button>
                   <span className="btn btn-ghost" style={{ cursor: 'default', color: 'var(--text-muted)', padding: '6px 12px' }}>
@@ -461,53 +461,53 @@ export default function CommunityPage() {
                                 {c.authorName.charAt(0).toUpperCase()}
                               </div>
                               <div style={{ flex: 1 }}>
-                                  <div style={{ background: 'var(--surface-lowest)', padding: '10px 14px', borderRadius: 16, borderTopLeftRadius: 4 }}>
-                                    <div style={{ fontWeight: 'bold', fontSize: 13, marginBottom: 2 }}>{c.authorName}</div>
-                                    <div style={{ fontSize: 14, color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>{c.content}</div>
-                                    
-                                    {c.media && c.media.length > 0 && (
-                                      <div style={{ 
-                                        display: 'grid', 
-                                        gridTemplateColumns: c.media.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(100px, 1fr))', 
-                                        gap: 6, 
-                                        marginTop: 10,
-                                        borderRadius: 12,
-                                        overflow: 'hidden'
-                                      }}>
-                                        {c.media.map((m, idx) => (
-                                          <div key={idx} style={{ position: 'relative', cursor: m.type === 'image' ? 'zoom-in' : 'pointer' }}>
-                                            {m.type === 'image' ? (
-                                              <img 
-                                                src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
-                                                alt="comment attachment" 
-                                                style={{ width: '100%', height: c.media.length > 1 ? '100px' : 'auto', maxHeight: '300px', objectFit: 'cover' }}
-                                                onClick={() => setActiveLightbox(m)}
-                                              />
-                                            ) : (
-                                              <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', background: 'var(--bg-card2)', borderRadius: 8, fontSize: 11, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)', height: '100%' }}>
-                                                <FileText size={16} color="#ef4444" />
-                                                <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
-                                              </a>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
+                                <div style={{ background: 'var(--surface-lowest)', padding: '10px 14px', borderRadius: 16, borderTopLeftRadius: 4 }}>
+                                  <div style={{ fontWeight: 'bold', fontSize: 13, marginBottom: 2 }}>{c.authorName}</div>
+                                  <div style={{ fontSize: 14, color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>{c.content}</div>
 
-                                  </div>
-                                
+                                  {c.media && c.media.length > 0 && (
+                                    <div style={{
+                                      display: 'grid',
+                                      gridTemplateColumns: c.media.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(100px, 1fr))',
+                                      gap: 6,
+                                      marginTop: 10,
+                                      borderRadius: 12,
+                                      overflow: 'hidden'
+                                    }}>
+                                      {c.media.map((m, idx) => (
+                                        <div key={idx} style={{ position: 'relative', cursor: m.type === 'image' ? 'zoom-in' : 'pointer' }}>
+                                          {m.type === 'image' ? (
+                                            <img
+                                              src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`}
+                                              alt="comment attachment"
+                                              style={{ width: '100%', height: c.media.length > 1 ? '100px' : 'auto', maxHeight: '300px', objectFit: 'cover' }}
+                                              onClick={() => setActiveLightbox(m)}
+                                            />
+                                          ) : (
+                                            <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', background: 'var(--bg-card2)', borderRadius: 8, fontSize: 11, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)', height: '100%' }}>
+                                              <FileText size={16} color="#ef4444" />
+                                              <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                                            </a>
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                </div>
+
                                 <div style={{ display: 'flex', gap: 12, marginTop: 4, paddingLeft: 8 }}>
-                                  <button 
+                                  <button
                                     onClick={() => handleCommentLike(post.id, c.id)}
-                                    className="btn btn-ghost" 
+                                    className="btn btn-ghost"
                                     style={{ fontSize: 12, padding: '4px 8px', color: hasLikedComment ? '#ef4444' : 'var(--text-faint)' }}
                                   >
                                     <Heart size={12} fill={hasLikedComment ? '#ef4444' : 'none'} style={{ marginRight: 4 }} /> {c.likes?.length || 0}
                                   </button>
 
-                                  <button 
+                                  <button
                                     onClick={() => setActiveReplyId(activeReplyId === c.id ? null : c.id)}
-                                    className="btn btn-ghost" 
+                                    className="btn btn-ghost"
                                     style={{ fontSize: 12, padding: '4px 8px', color: 'var(--text-faint)' }}
                                   >
                                     <ReplyIcon size={12} style={{ marginRight: 4 }} /> Répondre
@@ -536,11 +536,11 @@ export default function CommunityPage() {
                                                   {r.replyTo && <span style={{ color: 'var(--accent-purple)', fontSize: 11, marginLeft: 6, fontWeight: 'normal' }}>en réponse à {r.replyTo}</span>}
                                                 </div>
                                                 <div style={{ fontSize: 13, color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>{r.content}</div>
-                                                                                              {r.media && r.media.length > 0 && (
-                                                  <div style={{ 
-                                                    display: 'grid', 
-                                                    gridTemplateColumns: r.media.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(80px, 1fr))', 
-                                                    gap: 4, 
+                                                {r.media && r.media.length > 0 && (
+                                                  <div style={{
+                                                    display: 'grid',
+                                                    gridTemplateColumns: r.media.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(80px, 1fr))',
+                                                    gap: 4,
                                                     marginTop: 8,
                                                     borderRadius: 8,
                                                     overflow: 'hidden'
@@ -548,9 +548,9 @@ export default function CommunityPage() {
                                                     {r.media.map((m, idx) => (
                                                       <div key={idx} style={{ cursor: m.type === 'image' ? 'zoom-in' : 'pointer' }}>
                                                         {m.type === 'image' ? (
-                                                          <img 
-                                                            src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
-                                                            alt="reply attachment" 
+                                                          <img
+                                                            src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`}
+                                                            alt="reply attachment"
                                                             style={{ width: '100%', height: r.media.length > 1 ? '80px' : 'auto', maxHeight: '200px', objectFit: 'cover' }}
                                                             onClick={() => setActiveLightbox(m)}
                                                           />
@@ -564,20 +564,20 @@ export default function CommunityPage() {
                                                     ))}
                                                   </div>
                                                 )}
- )}
+
                                               </div>
 
                                               <div style={{ display: 'flex', gap: 8 }}>
-                                                <button 
+                                                <button
                                                   onClick={() => handleReplyLike(post.id, c.id, r.id)}
-                                                  className="btn btn-ghost" 
+                                                  className="btn btn-ghost"
                                                   style={{ fontSize: 11, padding: '2px 6px', marginTop: 2, color: hasLikedReply ? '#ef4444' : 'var(--text-faint)' }}
                                                 >
                                                   <Heart size={10} fill={hasLikedReply ? '#ef4444' : 'none'} style={{ marginRight: 3 }} /> {r.likes?.length || 0}
                                                 </button>
-                                                <button 
+                                                <button
                                                   onClick={() => setActiveReplyId(activeReplyId === r.id ? null : r.id)}
-                                                  className="btn btn-ghost" 
+                                                  className="btn btn-ghost"
                                                   style={{ fontSize: 11, padding: '2px 6px', marginTop: 2, color: 'var(--text-faint)' }}
                                                 >
                                                   <ReplyIcon size={10} style={{ marginRight: 3 }} /> Répondre
@@ -592,31 +592,31 @@ export default function CommunityPage() {
                                                       <div key={i} style={{ position: 'relative' }}>
                                                         {p.type === 'image' ? <img src={p.url} style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} /> : <FileText size={20} color="#ef4444" />}
                                                         <button onClick={() => {
-                                                          const newF = [...(replyFiles[r.id] || [])]; newF.splice(i, 1); setReplyFiles({...replyFiles, [r.id]: newF});
-                                                          const newP = [...(replyPreviews[r.id] || [])]; newP.splice(i, 1); setReplyPreviews({...replyPreviews, [r.id]: newP});
+                                                          const newF = [...(replyFiles[r.id] || [])]; newF.splice(i, 1); setReplyFiles({ ...replyFiles, [r.id]: newF });
+                                                          const newP = [...(replyPreviews[r.id] || [])]; newP.splice(i, 1); setReplyPreviews({ ...replyPreviews, [r.id]: newP });
                                                         }} style={{ position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 14, height: 14, fontSize: 8 }}>X</button>
 
                                                       </div>
                                                     ))}
                                                   </div>
-                                                  <form 
+                                                  <form
                                                     onSubmit={(e) => { e.preventDefault(); handleNestedReplySubmit(post.id, c.id, r.id); }}
                                                     style={{ display: 'flex', gap: 8, alignItems: 'center' }}
                                                   >
                                                     <input type="file" ref={el => replyFileInputRefs.current[r.id] = el} onChange={e => handleReplyFileChange(e, r.id)} style={{ display: 'none' }} multiple accept="image/*,application/pdf" />
                                                     <button type="button" onClick={() => replyFileInputRefs.current[r.id]?.click()} className="btn btn-ghost" style={{ padding: 4 }}><ImageIcon size={14} /></button>
-                                                    <input 
-                                                      type="text" 
-                                                      placeholder={`Répondre à ${r.authorName}...`} 
+                                                    <input
+                                                      type="text"
+                                                      placeholder={`Répondre à ${r.authorName}...`}
                                                       className="search-input"
                                                       value={replyInputs[r.id] || ''}
-                                                      onChange={e => setReplyInputs({...replyInputs, [r.id]: e.target.value})}
+                                                      onChange={e => setReplyInputs({ ...replyInputs, [r.id]: e.target.value })}
                                                       style={{ flex: 1, padding: '8px 12px', fontSize: 12, borderRadius: 20, background: 'var(--surface-lowest)' }}
                                                     />
-                                                    <button 
+                                                    <button
                                                       type="submit"
                                                       disabled={isUploading || (!replyInputs[r.id]?.trim() && (!replyFiles[r.id] || replyFiles[r.id].length === 0))}
-                                                      className="btn btn-ghost" 
+                                                      className="btn btn-ghost"
                                                       style={{ padding: '6px', color: 'var(--accent-purple)' }}
                                                     >
                                                       <Send size={14} />
@@ -635,43 +635,43 @@ export default function CommunityPage() {
 
                                 {/* Comment Reply Input */}
                                 {activeReplyId === c.id && (
-                                <div style={{ marginTop: 12, paddingLeft: 12 }}>
-                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-                                    {(replyPreviews[c.id] || []).map((p, i) => (
-                                      <div key={i} style={{ position: 'relative' }}>
-                                        {p.type === 'image' ? <img src={p.url} style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} /> : <FileText size={20} color="#ef4444" />}
-                                        <button onClick={() => {
-                                          const newF = [...(replyFiles[c.id] || [])]; newF.splice(i, 1); setReplyFiles({...replyFiles, [c.id]: newF});
-                                          const newP = [...(replyPreviews[c.id] || [])]; newP.splice(i, 1); setReplyPreviews({...replyPreviews, [c.id]: newP});
-                                        }} style={{ position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 14, height: 14, fontSize: 8 }}>X</button>
+                                  <div style={{ marginTop: 12, paddingLeft: 12 }}>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                                      {(replyPreviews[c.id] || []).map((p, i) => (
+                                        <div key={i} style={{ position: 'relative' }}>
+                                          {p.type === 'image' ? <img src={p.url} style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} /> : <FileText size={20} color="#ef4444" />}
+                                          <button onClick={() => {
+                                            const newF = [...(replyFiles[c.id] || [])]; newF.splice(i, 1); setReplyFiles({ ...replyFiles, [c.id]: newF });
+                                            const newP = [...(replyPreviews[c.id] || [])]; newP.splice(i, 1); setReplyPreviews({ ...replyPreviews, [c.id]: newP });
+                                          }} style={{ position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 14, height: 14, fontSize: 8 }}>X</button>
 
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <form 
-                                    onSubmit={(e) => { e.preventDefault(); handleReplySubmit(post.id, c.id); }}
-                                    style={{ display: 'flex', gap: 8, alignItems: 'center' }}
-                                  >
-                                    <input type="file" ref={el => replyFileInputRefs.current[c.id] = el} onChange={e => handleReplyFileChange(e, c.id)} style={{ display: 'none' }} multiple accept="image/*,application/pdf" />
-                                    <button type="button" onClick={() => replyFileInputRefs.current[c.id]?.click()} className="btn btn-ghost" style={{ padding: 6 }}><ImageIcon size={16} /></button>
-                                    <input 
-                                      type="text" 
-                                      placeholder={`Répondre à ${c.authorName}...`} 
-                                      className="search-input"
-                                      value={replyInputs[c.id] || ''}
-                                      onChange={e => setReplyInputs({...replyInputs, [c.id]: e.target.value})}
-                                      style={{ flex: 1, padding: '8px 12px', fontSize: 13, borderRadius: 20, background: 'var(--surface-lowest)' }}
-                                    />
-                                    <button 
-                                      type="submit"
-                                      disabled={isUploading || (!replyInputs[c.id]?.trim() && (!replyFiles[c.id] || replyFiles[c.id].length === 0))}
-                                      className="btn btn-ghost" 
-                                      style={{ padding: '8px', color: 'var(--accent-purple)' }}
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <form
+                                      onSubmit={(e) => { e.preventDefault(); handleReplySubmit(post.id, c.id); }}
+                                      style={{ display: 'flex', gap: 8, alignItems: 'center' }}
                                     >
-                                      <Send size={16} />
-                                    </button>
-                                  </form>
-                                </div>
+                                      <input type="file" ref={el => replyFileInputRefs.current[c.id] = el} onChange={e => handleReplyFileChange(e, c.id)} style={{ display: 'none' }} multiple accept="image/*,application/pdf" />
+                                      <button type="button" onClick={() => replyFileInputRefs.current[c.id]?.click()} className="btn btn-ghost" style={{ padding: 6 }}><ImageIcon size={16} /></button>
+                                      <input
+                                        type="text"
+                                        placeholder={`Répondre à ${c.authorName}...`}
+                                        className="search-input"
+                                        value={replyInputs[c.id] || ''}
+                                        onChange={e => setReplyInputs({ ...replyInputs, [c.id]: e.target.value })}
+                                        style={{ flex: 1, padding: '8px 12px', fontSize: 13, borderRadius: 20, background: 'var(--surface-lowest)' }}
+                                      />
+                                      <button
+                                        type="submit"
+                                        disabled={isUploading || (!replyInputs[c.id]?.trim() && (!replyFiles[c.id] || replyFiles[c.id].length === 0))}
+                                        className="btn btn-ghost"
+                                        style={{ padding: '8px', color: 'var(--accent-purple)' }}
+                                      >
+                                        <Send size={16} />
+                                      </button>
+                                    </form>
+                                  </div>
 
                                 )}
                               </div>
@@ -681,14 +681,14 @@ export default function CommunityPage() {
                       })}
                     </div>
                   )}
-                             <div style={{ marginTop: 12 }}>
+                  <div style={{ marginTop: 12 }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8, paddingLeft: 40 }}>
                       {(commentPreviews[post.id] || []).map((p, i) => (
                         <div key={i} style={{ position: 'relative' }}>
                           {p.type === 'image' ? <img src={p.url} style={{ width: 50, height: 50, borderRadius: 6, objectFit: 'cover' }} /> : <FileText size={24} color="#ef4444" />}
                           <button onClick={() => {
-                            const newF = [...(commentFiles[post.id] || [])]; newF.splice(i, 1); setCommentFiles({...commentFiles, [post.id]: newF});
-                            const newP = [...(commentPreviews[post.id] || [])]; newP.splice(i, 1); setCommentPreviews({...commentPreviews, [post.id]: newP});
+                            const newF = [...(commentFiles[post.id] || [])]; newF.splice(i, 1); setCommentFiles({ ...commentFiles, [post.id]: newF });
+                            const newP = [...(commentPreviews[post.id] || [])]; newP.splice(i, 1); setCommentPreviews({ ...commentPreviews, [post.id]: newP });
                           }} style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10 }}>X</button>
 
                         </div>
@@ -702,18 +702,18 @@ export default function CommunityPage() {
                       }}>
                         {user.username.charAt(0).toUpperCase()}
                       </div>
-                      <form 
+                      <form
                         onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(post.id); }}
                         style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'flex-end' }}
                       >
                         <input type="file" ref={el => commentFileInputRefs.current[post.id] = el} onChange={e => handleCommentFileChange(e, post.id)} style={{ display: 'none' }} multiple accept="image/*,application/pdf" />
                         <button type="button" onClick={() => commentFileInputRefs.current[post.id]?.click()} className="btn btn-ghost" style={{ padding: 8 }}><ImageIcon size={18} /></button>
-                        <textarea 
-                          placeholder="Write a comment..." 
+                        <textarea
+                          placeholder="Write a comment..."
                           className="search-input"
                           value={commentInputs[post.id] || ''}
                           onChange={e => {
-                            setCommentInputs({...commentInputs, [post.id]: e.target.value});
+                            setCommentInputs({ ...commentInputs, [post.id]: e.target.value });
                             e.target.style.height = 'auto';
                             e.target.style.height = e.target.scrollHeight + 'px';
                           }}
@@ -740,7 +740,7 @@ export default function CommunityPage() {
 
       {/* Lightbox Modal */}
       {activeLightbox && (
-        <div 
+        <div
           style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
             background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex',
@@ -748,15 +748,15 @@ export default function CommunityPage() {
           }}
           onClick={() => setActiveLightbox(null)}
         >
-          <button 
+          <button
             style={{ position: 'absolute', top: 30, right: 30, background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
             onClick={() => setActiveLightbox(null)}
           >
             <X size={32} />
           </button>
-          <img 
-            src={activeLightbox.url.startsWith('data:') ? activeLightbox.url : `${API.replace('/api', '')}${activeLightbox.url}`} 
-            alt="Full size" 
+          <img
+            src={activeLightbox.url.startsWith('data:') ? activeLightbox.url : `${API.replace('/api', '')}${activeLightbox.url}`}
+            alt="Full size"
             style={{ maxWidth: '95%', maxHeight: '95%', borderRadius: 8, boxShadow: '0 0 40px rgba(0,0,0,0.5)' }}
             onClick={(e) => e.stopPropagation()}
           />

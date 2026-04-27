@@ -67,105 +67,191 @@ export default function Notifications() {
 
   return (
     <div style={{ position: 'relative' }}>
-      <button onClick={toggleDropdown} className="btn btn-ghost" style={{ padding: '8px', position: 'relative' }}>
-        <Bell size={18} />
-        {hasNewSinceOpen && unreadCount > 0 && (
+      <button onClick={toggleDropdown} className="btn btn-ghost" style={{ padding: '8px', position: 'relative', overflow: 'visible' }}>
+        <Bell size={20} />
+        {unreadCount > 0 && (
           <span style={{
-            position: 'absolute', top: 6, right: 6, 
-            background: '#3b82f6', border: '2px solid var(--bg-card)',
-            borderRadius: '50%', width: 10, height: 10, 
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }} />
+            position: 'absolute', top: 2, right: 2, 
+            background: 'var(--accent-red, #ef4444)', color: 'white',
+            borderRadius: '50%', minWidth: 16, height: 16, 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10, fontWeight: 'bold', padding: '0 4px',
+            boxShadow: '0 0 10px rgba(239, 68, 68, 0.4)',
+            border: '2px solid var(--bg-card, #ffffff)'
+          }}>
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
         )}
       </button>
 
       {open && (
-        <div className="card shadow-lg" style={{
-          position: 'absolute', top: '120%', right: 0, 
-          width: 340, maxHeight: 480, overflowY: 'auto', 
-          marginTop: 8, zIndex: 100, padding: 0,
-          border: '1px solid var(--border)',
-          animation: 'slideDown 0.2s ease-out'
-        }}>
-          <div style={{ padding: '16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 'bold', fontSize: 16 }}>Notifications</span>
-            <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>{unreadCount} nouvelles</span>
+        <div 
+          className="card shadow-2xl" 
+          style={{
+            position: 'absolute', top: 'calc(100% + 12px)', right: 0, 
+            width: 360, maxHeight: 520, overflowY: 'auto', 
+            zIndex: 1000, padding: 0,
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(25px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(25px) saturate(180%)',
+            borderRadius: 20,
+            animation: 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            display: 'flex', flexDirection: 'column'
+          }}
+        >
+          <div style={{ 
+            padding: '20px', 
+            borderBottom: '1px solid var(--border)', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            background: 'rgba(255, 255, 255, 0.5)'
+          }}>
+            <span style={{ fontWeight: 800, fontSize: 18, fontFamily: 'var(--font-display)' }}>Notifications</span>
+            {unreadCount > 0 && (
+              <span style={{ 
+                fontSize: 11, 
+                fontWeight: 600,
+                color: 'white', 
+                background: 'var(--accent-purple, #8b5cf6)', 
+                padding: '4px 10px', 
+                borderRadius: 20 
+              }}>
+                {unreadCount} Nouvelles
+              </span>
+            )}
           </div>
           
-          {notifications.length === 0 ? (
-            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-faint)' }}>
-              <Bell size={32} style={{ marginBottom: 12, opacity: 0.3 }} />
-              <p>Aucune notification</p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {notifications.map(n => {
-                const link = n.postId ? `/community?postId=${n.postId}` : '/community';
-                return (
-                  <Link 
-                    key={n.id} 
-                    to={link} 
-                    onClick={() => { markOneAsRead(n.id); setOpen(false); }} 
-                    style={{
-                      padding: '14px 16px', 
-                      borderBottom: '1px solid var(--border)',
-                      background: n.isRead ? 'transparent' : 'rgba(59, 130, 246, 0.05)',
-                      display: 'flex', gap: 14, alignItems: 'flex-start',
-                      textDecoration: 'none', color: 'inherit',
-                      transition: 'background 0.2s'
-                    }}
-                    className="notif-item"
-                  >
-                    <div style={{
-                      width: 36, height: 36, borderRadius: '50%', 
-                      background: 'var(--bg-card2)', border: '1px solid var(--border)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                      color: 'var(--text)', fontWeight: 'bold', fontSize: 14, flexShrink: 0,
-                      position: 'relative'
-                    }}>
-                      {n.actorName.charAt(0).toUpperCase()}
+          <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
+            {notifications.length === 0 ? (
+              <div style={{ padding: 60, textAlign: 'center', color: 'var(--text-faint)' }}>
+                <div style={{ 
+                  width: 64, height: 64, borderRadius: '50%', background: 'var(--surface-lowest)', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' 
+                }}>
+                  <Bell size={32} style={{ opacity: 0.3 }} />
+                </div>
+                <p style={{ fontWeight: 500 }}>Tout est calme ici</p>
+                <span style={{ fontSize: 12 }}>Vous n'avez pas encore de notifications.</span>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {notifications.map(n => {
+                  const link = n.postId ? `/community?postId=${n.postId}` : '/community';
+                  return (
+                    <Link 
+                      key={n.id} 
+                      to={link} 
+                      onClick={() => { markOneAsRead(n.id); setOpen(false); }} 
+                      style={{
+                        padding: '16px 20px', 
+                        borderBottom: '1px solid rgba(0,0,0,0.03)',
+                        background: n.isRead ? 'transparent' : 'rgba(59, 130, 246, 0.04)',
+                        display: 'flex', gap: 16, alignItems: 'flex-start',
+                        textDecoration: 'none', color: 'inherit',
+                        transition: 'all 0.2s ease',
+                        position: 'relative',
+                        borderLeft: n.isRead ? '4px solid transparent' : '4px solid #3b82f6'
+                      }}
+                      className="notif-item"
+                    >
                       <div style={{
-                        position: 'absolute', bottom: -2, right: -2,
-                        background: 'var(--surface)', borderRadius: '50%', padding: 3,
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        width: 44, height: 44, borderRadius: '14px', 
+                        background: 'var(--bg-card2, #f3f4f6)', 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                        color: 'var(--text)', fontWeight: 'bold', fontSize: 16, flexShrink: 0,
+                        position: 'relative',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                       }}>
-                        {getIcon(n.type)}
+                        {n.actorName.charAt(0).toUpperCase()}
+                        <div style={{
+                          position: 'absolute', bottom: -4, right: -4,
+                          background: 'white', borderRadius: '50%', padding: 4,
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}>
+                          {getIcon(n.type)}
+                        </div>
                       </div>
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, lineHeight: 1.4 }}>
-                        <span style={{ fontWeight: 'bold' }}>{n.actorName}</span>
-                        {n.type === 'FOLLOW' && ' a commencé à vous suivre'}
-                        {n.type === 'LIKE' && ' a aimé votre publication'}
-                        {n.type === 'LIKE_COMMENT' && ' a aimé votre commentaire'}
-                        {n.type === 'LIKE_REPLY' && ' a aimé votre réponse'}
-                        {n.type === 'COMMENT' && ' a commenté votre publication'}
-                        {n.type === 'REPLY' && ' a répondu à votre commentaire'}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--text)' }}>
+                          <span style={{ fontWeight: 700 }}>{n.actorName}</span>
+                          <span style={{ marginLeft: 4 }}>
+                            {n.type === 'FOLLOW' && 'a commencé à vous suivre'}
+                            {n.type === 'LIKE' && 'a aimé votre publication'}
+                            {n.type === 'LIKE_COMMENT' && 'a aimé votre commentaire'}
+                            {n.type === 'LIKE_REPLY' && 'a aimé votre réponse'}
+                            {n.type === 'COMMENT' && 'a commenté votre publication'}
+                            {n.type === 'REPLY' && 'a répondu à votre commentaire'}
+                          </span>
+                        </div>
+                        <div style={{ 
+                          fontSize: 12, 
+                          color: 'var(--text-faint)', 
+                          marginTop: 6, 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'space-between'
+                        }}>
+                          <span>{new Date(n.timestamp).toLocaleDateString()}</span>
+                          {!n.isRead && (
+                            <span style={{ 
+                              fontSize: 9, 
+                              fontWeight: 900, 
+                              background: '#3b82f6', 
+                              color: 'white', 
+                              padding: '2px 6px', 
+                              borderRadius: 4,
+                              letterSpacing: '0.5px'
+                            }}>NOUVEAU</span>
+                          )}
+                        </div>
                       </div>
-                      <div style={{ fontSize: 12, color: 'var(--text-faint)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {new Date(n.timestamp).toLocaleDateString()}
-                        {!n.isRead && (
-                          <span style={{ width: 6, height: 6, background: '#3b82f6', borderRadius: '50%' }} />
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          
+          <div style={{ 
+            padding: '12px', 
+            textAlign: 'center', 
+            background: 'rgba(255, 255, 255, 0.5)',
+            borderTop: '1px solid var(--border)' 
+          }}>
+            <button 
+              onClick={() => setOpen(false)}
+              style={{ fontSize: 12, fontWeight: 600, color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Fermer
+            </button>
+          </div>
         </div>
       )}
       
       <style>{`
         @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .notif-item:hover {
-          background: var(--bg-card2) !important;
+          background: rgba(0, 0, 0, 0.02) !important;
+          transform: translateX(4px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(0,0,0,0.1);
+          border-radius: 10px;
         }
       `}</style>
     </div>
+
   );
 }
