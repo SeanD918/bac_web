@@ -28,8 +28,10 @@ export default function CommunityPage() {
   const replyFileInputRefs = useRef({});
 
   const [activeReplyId, setActiveReplyId] = useState(null);
+  const [activeLightbox, setActiveLightbox] = useState(null); // { url, type }
 
   const postRefs = useRef({});
+
 
   useEffect(() => {
     if (!user) {
@@ -385,33 +387,37 @@ export default function CommunityPage() {
                 {post.media && post.media.length > 0 && (
                   <div style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: post.media.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))', 
-                    gap: 12, 
-                    marginBottom: 24 
+                    gridTemplateColumns: post.media.length === 1 ? '1fr' : post.media.length === 2 ? '1fr 1fr' : 'repeat(auto-fit, minmax(180px, 1fr))', 
+                    gridAutoRows: post.media.length === 1 ? 'auto' : '200px',
+                    gap: 8, 
+                    marginBottom: 20,
+                    borderRadius: 16,
+                    overflow: 'hidden'
                   }}>
                     {post.media.map((m, idx) => (
-                      <div key={idx}>
+                      <div key={idx} style={{ 
+                        position: 'relative', 
+                        height: '100%',
+                        cursor: m.type === 'image' ? 'zoom-in' : 'pointer'
+                      }}>
                         {m.type === 'image' ? (
                           <img 
                             src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                             alt={`Attachment ${idx + 1}`} 
-                            style={{ width: '100%', borderRadius: 12, border: '1px solid var(--border)', cursor: 'pointer', objectFit: 'cover', height: post.media.length > 1 ? '200px' : 'auto' }}
-                            onClick={() => window.open(m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`, '_blank')}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onClick={() => setActiveLightbox(m)}
                           />
-
                         ) : (
                           <a 
                             href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="card"
-                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'var(--surface-lowest)', textDecoration: 'none', border: '1px solid var(--border)', height: '100%' }}
+                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, background: 'var(--surface-lowest)', textDecoration: 'none', height: '100%', border: '1px solid var(--border)' }}
                           >
-
-                            <FileText size={32} color="#ef4444" />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontWeight: 'bold', color: 'var(--text)', fontSize: 14 }}>{m.name || 'PDF Document'}</div>
-                              <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>View Document</div>
+                            <FileText size={40} color="#ef4444" />
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ fontWeight: 'bold', color: 'var(--text)', fontSize: 13, maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name || 'PDF Document'}</div>
+                              <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 4 }}>Cliquez pour ouvrir</div>
                             </div>
                           </a>
                         )}
@@ -419,6 +425,7 @@ export default function CommunityPage() {
                     ))}
                   </div>
                 )}
+
 
 
                 
@@ -466,9 +473,10 @@ export default function CommunityPage() {
                                               <img 
                                                 src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                                                 alt="comment attachment" 
-                                                style={{ maxWidth: '120px', borderRadius: 8, border: '1px solid var(--border)', cursor: 'pointer' }}
-                                                onClick={() => window.open(m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`, '_blank')}
+                                                style={{ maxWidth: '120px', borderRadius: 8, border: '1px solid var(--border)', cursor: 'zoom-in' }}
+                                                onClick={() => setActiveLightbox(m)}
                                               />
+
 
                                             ) : (
                                               <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'var(--bg-card2)', borderRadius: 8, fontSize: 11, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
@@ -532,9 +540,10 @@ export default function CommunityPage() {
                                                           <img 
                                                             src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                                                             alt="reply attachment" 
-                                                            style={{ maxWidth: '100px', borderRadius: 6, border: '1px solid var(--border)', cursor: 'pointer' }}
-                                                            onClick={() => window.open(m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`, '_blank')}
+                                                            style={{ maxWidth: '100px', borderRadius: 6, border: '1px solid var(--border)', cursor: 'zoom-in' }}
+                                                            onClick={() => setActiveLightbox(m)}
                                                           />
+
 
                                                         ) : (
                                                           <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: 'var(--surface-lowest)', borderRadius: 6, fontSize: 10, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
@@ -719,6 +728,32 @@ export default function CommunityPage() {
           })}
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {activeLightbox && (
+        <div 
+          style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+            background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex',
+            alignItems: 'center', justifyContent: 'center', padding: 40
+          }}
+          onClick={() => setActiveLightbox(null)}
+        >
+          <button 
+            style={{ position: 'absolute', top: 30, right: 30, background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+            onClick={() => setActiveLightbox(null)}
+          >
+            <X size={32} />
+          </button>
+          <img 
+            src={activeLightbox.url.startsWith('data:') ? activeLightbox.url : `${API.replace('/api', '')}${activeLightbox.url}`} 
+            alt="Full size" 
+            style={{ maxWidth: '95%', maxHeight: '95%', borderRadius: 8, boxShadow: '0 0 40px rgba(0,0,0,0.5)' }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
+
   );
 }
