@@ -14,10 +14,6 @@ const { router: notificationRoutes } = require('./routes/notifications');
 const app = express();
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
-app.use((req, res, next) => {
-  console.log(`[BacWeb API] ${req.method} ${req.url} (Env: ${process.env.VERCEL ? 'Vercel' : 'Local'})`);
-  next();
-});
 
 app.use(cors());
 app.use(express.json());
@@ -78,12 +74,9 @@ app.use((err, _req, res, _next) => {
   });
 });
 
-// ─── Server Start ────────────────────────────────────────────────────────────
 if (require.main === module && !process.env.VERCEL) {
   const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`BacWeb Server running on http://localhost:${PORT}`);
-  });
+  app.listen(PORT);
 }
 
 module.exports = app;

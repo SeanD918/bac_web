@@ -11,7 +11,6 @@ function getStore(filename) {
     const tmpPath = path.join(os.tmpdir(), filename);
     try {
       if (!fs.existsSync(tmpPath)) {
-        console.log(`[BacWeb] Initializing /tmp storage for ${filename}`);
         if (fs.existsSync(staticPath)) {
           fs.copyFileSync(staticPath, tmpPath);
         } else {

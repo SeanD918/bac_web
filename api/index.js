@@ -1,4 +1,3 @@
-console.log('[Vercel] API Entry point loaded');
 // This is the Vercel serverless entry point
 // It wraps your Express app and makes it work on Vercel
 try {
