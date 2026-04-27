@@ -1,0 +1,29 @@
+[
+  {
+    "id": "6023c899-fa01-403f-a169-8ef668837868",
+    "targetUserId": "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e",
+    "actorName": "slim",
+    "type": "REPLY",
+    "postId": "9e84f581-335d-449c-83bf-e1836987dd7f",
+    "isRead": true,
+    "timestamp": "2026-04-26T14:11:24.495Z"
+  },
+  {
+    "id": "a2c4adc7-b8b4-4ad3-94e8-016a7d46ffb7",
+    "targetUserId": "37ca2a44-a515-42d6-9277-9ffa7a2fca56",
+    "actorName": "raya",
+    "type": "LIKE_REPLY",
+    "postId": "9e84f581-335d-449c-83bf-e1836987dd7f",
+    "isRead": true,
+    "timestamp": "2026-04-26T14:14:09.486Z"
+  },
+  {
+    "id": "27f051a6-5025-4712-b541-3e124d1f39ff",
+    "targetUserId": "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e",
+    "actorName": "slim",
+    "type": "LIKE_REPLY",
+    "postId": "9e84f581-335d-449c-83bf-e1836987dd7f",
+    "isRead": true,
+    "timestamp": "2026-04-26T14:18:19.486Z"
+  }
+]

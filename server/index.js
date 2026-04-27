@@ -6,6 +6,10 @@ const path = require('path');
 const examRoutes  = require('./routes/exams');
 const uploadRoutes = require('./routes/upload');
 const chatRoutes  = require('./routes/chat');
+const { router: authRoutes } = require('./routes/auth');
+const communityRoutes = require('./routes/community');
+const messageRoutes = require('./routes/messages');
+const { router: notificationRoutes } = require('./routes/notifications');
 
 const app = express();
 
@@ -46,11 +50,19 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api', examRoutes);
 app.use('/api', uploadRoutes);
 app.use('/api', chatRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/community', communityRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Fallback for direct function calls
 app.use(examRoutes);
 app.use(uploadRoutes);
 app.use(chatRoutes);
+app.use('/auth', authRoutes);
+app.use('/community', communityRoutes);
+app.use('/messages', messageRoutes);
+app.use('/notifications', notificationRoutes);
 
 // API 404 handler
 app.use('/api', (req, res) => {

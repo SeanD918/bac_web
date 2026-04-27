@@ -12,6 +12,10 @@ import CalculatorPage from './pages/CalculatorPage'
 import ViewerPage from './pages/ViewerPage'
 import './App.css'
 
+import AuthPage from './pages/AuthPage'
+import CommunityPage from './pages/CommunityPage'
+import MessagesPage from './pages/MessagesPage'
+
 function App() {
   return (
     <div className="app-shell">
@@ -26,6 +30,9 @@ function App() {
           <Route path="/calculator"   element={<CalculatorPage />} />
           <Route path="/about"        element={<AboutPage />} />
           <Route path="/admin"        element={<AdminPage />} />
+          <Route path="/auth"         element={<AuthPage />} />
+          <Route path="/community"    element={<CommunityPage />} />
+          <Route path="/messages/:userId" element={<MessagesPage />} />
         </Routes>
       </main>
       <Chatbot />

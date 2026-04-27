@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft, Download, ExternalLink, Printer, Info, FileText, CheckCircle } from 'lucide-react';
+import { ChevronLeft, Download, ExternalLink, Printer, Info, FileText, CheckCircle, AlertTriangle } from 'lucide-react';
 import axios from 'axios';
 import API from '../config/api';
 import './ViewerPage.css';
@@ -12,13 +12,31 @@ const ViewerPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState('exam'); // 'exam' or 'correction'
+  const [fileBroken, setFileBroken] = useState(false);
 
   useEffect(() => {
-    const fetchExam = async () => {
+    const fetchAndVerify = async () => {
       try {
         setLoading(true);
+        // 1. Fetch Exam Data
         const response = await axios.get(`${API}/exams/${id}`);
-        setExam(response.data);
+        const data = response.data;
+        setExam(data);
+
+        // 2. Verify link existence via backend proxy
+        const url = viewMode === 'exam' ? data.examUrl : data.correctionUrl;
+        if (url) {
+          try {
+            const verify = await axios.get(`${API}/verify-link?url=${encodeURIComponent(url)}`);
+            setFileBroken(!verify.data.exists);
+          } catch (vErr) {
+            console.error('Verification failed', vErr);
+            setFileBroken(false); // Assume fine if verification itself fails
+          }
+        } else {
+          setFileBroken(true);
+        }
+
         setLoading(false);
       } catch (err) {
         console.error('Error fetching exam:', err);
@@ -27,8 +45,8 @@ const ViewerPage = () => {
       }
     };
 
-    fetchExam();
-  }, [id]);
+    fetchAndVerify();
+  }, [id, viewMode]);
 
   if (loading) {
     return (
@@ -43,6 +61,7 @@ const ViewerPage = () => {
     return (
       <div className="viewer-error">
         <div className="error-card">
+          <AlertTriangle size={48} color="#ef4444" style={{ marginBottom: 16 }} />
           <h2>Oops!</h2>
           <p>{error || "Nous n'avons pas pu trouver cet examen."}</p>
           <button onClick={() => navigate(-1)} className="btn btn-primary">
@@ -107,11 +126,20 @@ const ViewerPage = () => {
 
       <main className="viewer-main">
         <div className="iframe-container">
-          <iframe 
-            src={`${proxyUrl}#toolbar=0&navpanes=0`} 
-            title={title}
-            className="pdf-iframe"
-          />
+          {fileBroken ? (
+            <div className="viewer-error-overlay">
+              <AlertTriangle size={48} color="#f59e0b" />
+              <h2>Fichier non trouvé</h2>
+              <p>Désolé, ce fichier n'est plus disponible sur la source officielle (bacweb.tn).</p>
+              <button onClick={() => navigate(-1)} className="btn btn-primary">Retourner au catalogue</button>
+            </div>
+          ) : (
+            <iframe 
+              src={`${proxyUrl}#toolbar=0&navpanes=0`} 
+              title={title}
+              className="pdf-iframe"
+            />
+          )}
         </div>
 
         <aside className="viewer-sidebar">
@@ -137,7 +165,7 @@ const ViewerPage = () => {
                 <span className="label">Correction</span>
                 <span className="value">
                   {exam.hasCorrection ? (
-                    <span className="text-success"><CheckCircle size={14} inline /> Disponible</span>
+                    <span className="text-success"><CheckCircle size={14} /> Disponible</span>
                   ) : 'Non disponible'}
                 </span>
               </div>

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "9e84f581-335d-449c-83bf-e1836987dd7f",
+    "authorId": "37ca2a44-a515-42d6-9277-9ffa7a2fca56",
+    "authorName": "slim",
+    "content": "CHKOUN 3ANDO SERIE PYTHON",
+    "tag": "General",
+    "likes": [
+      "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e"
+    ],
+    "comments": [
+      {
+        "id": "9a0f792f-cde3-4ed6-823c-e09e6be4455f",
+        "authorId": "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e",
+        "authorName": "raya",
+        "content": "ena 3andi",
+        "timestamp": "2026-04-26T14:01:51.857Z",
+        "replies": [
+          {
+            "id": "ff4b45de-92b2-4f96-81a9-75bf5b38fc4e",
+            "authorId": "37ca2a44-a515-42d6-9277-9ffa7a2fca56",
+            "authorName": "slim",
+            "content": "prv",
+            "timestamp": "2026-04-26T14:11:24.494Z",
+            "likes": [
+              "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e"
+            ]
+          },
+          {
+            "id": "35041330-bbae-46ac-b61c-ce42ebdfe291",
+            "authorId": "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e",
+            "authorName": "raya",
+            "content": "walla le ab3th lena",
+            "likes": [
+              "37ca2a44-a515-42d6-9277-9ffa7a2fca56"
+            ],
+            "timestamp": "2026-04-26T14:13:21.264Z"
+          },
+          {
+            "id": "7081a519-5779-463d-a1ff-4c9b351d10fe",
+            "authorId": "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e",
+            "authorName": "raya",
+            "content": "tetdalel",
+            "replyTo": "raya",
+            "likes": [],
+            "timestamp": "2026-04-26T14:22:02.145Z"
+          }
+        ],
+        "likes": [
+          "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e"
+        ]
+      }
+    ],
+    "timestamp": "2026-04-26T14:00:10.748Z"
+  }
+]

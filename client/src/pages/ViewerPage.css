@@ -273,6 +273,33 @@
   to { transform: rotate(360deg); }
 }
 
+.viewer-error-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(4px);
+  color: white;
+  text-align: center;
+  padding: 2rem;
+  z-index: 5;
+}
+
+.viewer-error-overlay h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.viewer-error-overlay p {
+  color: var(--text-faint);
+  max-width: 400px;
+  margin-bottom: 2rem;
+}
+
+
 @media (max-width: 1024px) {
   .viewer-sidebar {
     display: none;

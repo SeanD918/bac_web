@@ -28,35 +28,34 @@ export default function ExamCard({ exam }) {
       <h3>{exam.subject}</h3>
 
       <div className="exam-card-actions">
-        {exam.hasExam !== false ? (
+        {exam.exists !== false ? (
           <Link
             to={`/view/${exam.id}`}
-            className="exam-action-btn primary"
+            className="icon-btn icon-btn-exam"
           >
-            <FileText size={14} />
-            Sujet
+            <FileText size={14} /> Sujet
           </Link>
         ) : (
-          <button className="exam-action-btn disabled" disabled>
-            <FileText size={14} />
-            —
+          <button className="icon-btn icon-btn-disabled" disabled style={{ opacity: 0.5 }}>
+            <FileText size={14} /> Aucun
           </button>
         )}
-        {exam.hasCorrection ? (
+        {exam.hasCorrection && exam.correctionExists !== false ? (
           <Link
-            to={`/view/${exam.id}`}
+            to={`/view/${exam.id}?mode=correction`}
             className="exam-action-btn secondary"
           >
             <BookOpen size={14} />
             Corrigé
           </Link>
         ) : (
-          <button className="exam-action-btn disabled" disabled>
+          <button className="exam-action-btn disabled" disabled title={exam.hasCorrection ? "Non disponible" : "Pas de corrigé"}>
             <BookOpen size={14} />
             —
           </button>
         )}
       </div>
+
     </div>
   )
 }

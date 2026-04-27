@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Link } from 'react-router-dom'
-import { BookOpen, Search, GraduationCap, Menu, X, LayoutGrid, Info, UploadCloud, Calculator } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { BookOpen, Search, GraduationCap, Menu, X, LayoutGrid, Info, UploadCloud, Calculator, Users, LogIn, LogOut } from 'lucide-react'
+
+import Notifications from './Notifications'
 
 const NAV_ITEMS = [
   { to: '/',         label: 'Accueil',   icon: <GraduationCap size={15} /> },
   { to: '/browse',   label: 'Parcourir', icon: <Search size={15} /> },
   { to: '/sections', label: 'Sections',  icon: <LayoutGrid size={15} /> },
+  { to: '/community',label: 'Communauté',icon: <Users size={15} /> },
   { to: '/calculator', label: 'Calculateur', icon: <Calculator size={15} /> },
   { to: '/about',    label: 'À propos',  icon: <Info size={15} /> },
 ]
@@ -13,6 +17,7 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { user, logout } = useAuth()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -47,10 +52,21 @@ export default function Navbar() {
           </ul>
 
           <div className="nav-actions">
-            <Link to="/browse" className="btn btn-primary">
-              <Search size={14} />
-              Rechercher
-            </Link>
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Notifications />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 8, paddingLeft: 16, borderLeft: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: 14, fontWeight: 500 }}>{user.username}</span>
+                  <button onClick={logout} className="btn btn-ghost" style={{ padding: '8px 12px' }}>
+                    <LogOut size={16} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link to="/auth" className="btn btn-primary">
+                <LogIn size={14} /> Connexion
+              </Link>
+            )}
           </div>
 
           <button

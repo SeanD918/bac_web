@@ -1,0 +1,22 @@
+[
+  {
+    "id": "37ca2a44-a515-42d6-9277-9ffa7a2fca56",
+    "username": "slim",
+    "password": "slim123",
+    "followers": [
+      "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e"
+    ],
+    "following": [],
+    "token": "3db11c4dff30300241e37b0f4e2bf078"
+  },
+  {
+    "id": "a87fdc3b-7ef5-4e28-89de-32f1e4e8c18e",
+    "username": "raya",
+    "password": "rayaraya",
+    "followers": [],
+    "following": [
+      "37ca2a44-a515-42d6-9277-9ffa7a2fca56"
+    ],
+    "token": "c8f0b293190b20d5258fe7d551379ace"
+  }
+]
