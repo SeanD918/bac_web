@@ -466,29 +466,34 @@ export default function CommunityPage() {
                                     <div style={{ fontSize: 14, color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>{c.content}</div>
                                     
                                     {c.media && c.media.length > 0 && (
-                                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+                                      <div style={{ 
+                                        display: 'grid', 
+                                        gridTemplateColumns: c.media.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(100px, 1fr))', 
+                                        gap: 6, 
+                                        marginTop: 10,
+                                        borderRadius: 12,
+                                        overflow: 'hidden'
+                                      }}>
                                         {c.media.map((m, idx) => (
-                                          <div key={idx} style={{ maxWidth: '100%' }}>
+                                          <div key={idx} style={{ position: 'relative', cursor: m.type === 'image' ? 'zoom-in' : 'pointer' }}>
                                             {m.type === 'image' ? (
                                               <img 
                                                 src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                                                 alt="comment attachment" 
-                                                style={{ maxWidth: '120px', borderRadius: 8, border: '1px solid var(--border)', cursor: 'zoom-in' }}
+                                                style={{ width: '100%', height: c.media.length > 1 ? '100px' : 'auto', maxHeight: '300px', objectFit: 'cover' }}
                                                 onClick={() => setActiveLightbox(m)}
                                               />
-
-
                                             ) : (
-                                              <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'var(--bg-card2)', borderRadius: 8, fontSize: 11, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
-
-                                                <FileText size={14} color="#ef4444" />
-                                                <span style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                                              <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', background: 'var(--bg-card2)', borderRadius: 8, fontSize: 11, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)', height: '100%' }}>
+                                                <FileText size={16} color="#ef4444" />
+                                                <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
                                               </a>
                                             )}
                                           </div>
                                         ))}
                                       </div>
                                     )}
+
                                   </div>
                                 
                                 <div style={{ display: 'flex', gap: 12, marginTop: 4, paddingLeft: 8 }}>
@@ -531,31 +536,35 @@ export default function CommunityPage() {
                                                   {r.replyTo && <span style={{ color: 'var(--accent-purple)', fontSize: 11, marginLeft: 6, fontWeight: 'normal' }}>en réponse à {r.replyTo}</span>}
                                                 </div>
                                                 <div style={{ fontSize: 13, color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>{r.content}</div>
-                                                
-                                                {r.media && r.media.length > 0 && (
-                                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                                                                                              {r.media && r.media.length > 0 && (
+                                                  <div style={{ 
+                                                    display: 'grid', 
+                                                    gridTemplateColumns: r.media.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(80px, 1fr))', 
+                                                    gap: 4, 
+                                                    marginTop: 8,
+                                                    borderRadius: 8,
+                                                    overflow: 'hidden'
+                                                  }}>
                                                     {r.media.map((m, idx) => (
-                                                      <div key={idx}>
+                                                      <div key={idx} style={{ cursor: m.type === 'image' ? 'zoom-in' : 'pointer' }}>
                                                         {m.type === 'image' ? (
                                                           <img 
                                                             src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                                                             alt="reply attachment" 
-                                                            style={{ maxWidth: '100px', borderRadius: 6, border: '1px solid var(--border)', cursor: 'zoom-in' }}
+                                                            style={{ width: '100%', height: r.media.length > 1 ? '80px' : 'auto', maxHeight: '200px', objectFit: 'cover' }}
                                                             onClick={() => setActiveLightbox(m)}
                                                           />
-
-
                                                         ) : (
-                                                          <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: 'var(--surface-lowest)', borderRadius: 6, fontSize: 10, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
-
-                                                            <FileText size={12} color="#ef4444" />
-                                                            <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                                                          <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 8px', background: 'var(--surface-lowest)', borderRadius: 6, fontSize: 10, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)', height: '100%' }}>
+                                                            <FileText size={14} color="#ef4444" />
+                                                            <span style={{ maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
                                                           </a>
                                                         )}
                                                       </div>
                                                     ))}
                                                   </div>
                                                 )}
+ )}
                                               </div>
 
                                               <div style={{ display: 'flex', gap: 8 }}>
