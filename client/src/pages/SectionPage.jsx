@@ -228,7 +228,7 @@ function SectionExamRow({ exam, color }) {
         </div>
       </div>
       <div className="exam-list-actions">
-        {exam.hasExam !== false ? (
+        {exam.exists !== false ? (
           <Link
             to={`/view/${exam.id}`}
             className="icon-btn icon-btn-exam"
@@ -236,19 +236,19 @@ function SectionExamRow({ exam, color }) {
             <FileText size={14} /> Sujet
           </Link>
         ) : (
-          <button className="icon-btn icon-btn-disabled" disabled>
-            <FileText size={14} /> —
+          <button className="icon-btn icon-btn-disabled" disabled style={{ opacity: 0.5 }}>
+            <FileText size={14} /> Aucun
           </button>
         )}
-        {exam.hasCorrection ? (
+        {exam.hasCorrection && exam.correctionExists !== false ? (
           <Link
-            to={`/view/${exam.id}`}
+            to={`/view/${exam.id}?mode=correction`}
             className="icon-btn icon-btn-corr"
           >
             <BookOpen size={14} /> Corrigé
           </Link>
         ) : (
-          <button className="icon-btn icon-btn-disabled" disabled>
+          <button className="icon-btn icon-btn-disabled" disabled title={exam.hasCorrection ? "Fichier non trouvé" : "Pas de corrigé"}>
             <BookOpen size={14} /> —
           </button>
         )}

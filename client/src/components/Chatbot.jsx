@@ -10,7 +10,7 @@ const Chatbot = () => {
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [sections, setSections] = useState([]);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = React.useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

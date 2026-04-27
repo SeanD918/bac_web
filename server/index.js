@@ -15,7 +15,7 @@ const app = express();
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use((req, res, next) => {
-  console.log(`[Request]: ${req.method} ${req.url}`);
+  console.log(`[BacWeb API] ${req.method} ${req.url} (Env: ${process.env.VERCEL ? 'Vercel' : 'Local'})`);
   next();
 });
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -15,22 +15,22 @@ export default function CommunityPage() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef(null);
+  const fileInputRef = React.useRef(null);
 
   const [commentInputs, setCommentInputs] = useState({});
   const [commentFiles, setCommentFiles] = useState({});
   const [commentPreviews, setCommentPreviews] = useState({});
-  const commentFileInputRefs = useRef({});
+  const commentFileInputRefs = React.useRef({});
 
   const [replyInputs, setReplyInputs] = useState({});
   const [replyFiles, setReplyFiles] = useState({});
   const [replyPreviews, setReplyPreviews] = useState({});
-  const replyFileInputRefs = useRef({});
+  const replyFileInputRefs = React.useRef({});
 
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [activeLightbox, setActiveLightbox] = useState(null); // { url, type }
 
-  const postRefs = useRef({});
+  const postRefs = React.useRef({});
 
 
   useEffect(() => {
@@ -99,9 +99,7 @@ export default function CommunityPage() {
         formData.append('media', file);
       });
 
-      const res = await axios.post(`${API}/community/posts`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axios.post(`${API}/community/posts`, formData);
 
       setPosts([res.data, ...posts]);
       setNewPost('');
@@ -179,9 +177,7 @@ export default function CommunityPage() {
       const formData = new FormData();
       formData.append('content', content || '');
       files.forEach(f => formData.append('media', f));
-      const res = await axios.post(`${API}/community/posts/${postId}/comment`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axios.post(`${API}/community/posts/${postId}/comment`, formData);
       setPosts(posts.map(p => p.id === postId ? res.data : p));
       setCommentInputs({ ...commentInputs, [postId]: '' });
       setCommentFiles({ ...commentFiles, [postId]: [] });
@@ -199,9 +195,7 @@ export default function CommunityPage() {
       const formData = new FormData();
       formData.append('content', content || '');
       files.forEach(f => formData.append('media', f));
-      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/reply`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/reply`, formData);
       setPosts(posts.map(p => p.id === postId ? res.data : p));
       setReplyInputs({ ...replyInputs, [commentId]: '' });
       setReplyFiles({ ...replyFiles, [commentId]: [] });
@@ -220,9 +214,7 @@ export default function CommunityPage() {
       const formData = new FormData();
       formData.append('content', content || '');
       files.forEach(f => formData.append('media', f));
-      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/replies/${replyId}/reply`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/replies/${replyId}/reply`, formData);
       setPosts(posts.map(p => p.id === postId ? res.data : p));
       setReplyInputs({ ...replyInputs, [replyId]: '' });
       setReplyFiles({ ...replyFiles, [replyId]: [] });

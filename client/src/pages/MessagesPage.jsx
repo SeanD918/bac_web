@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -15,11 +15,11 @@ export default function MessagesPage() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef(null);
+  const fileInputRef = React.useRef(null);
 
   const [targetUser, setTargetUser] = useState(null);
   const [activeLightbox, setActiveLightbox] = useState(null); // { url, type }
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = React.useRef(null);
 
 
 
@@ -81,9 +81,7 @@ export default function MessagesPage() {
       formData.append('content', newMessage);
       selectedFiles.forEach(f => formData.append('media', f));
 
-      const res = await axios.post(`${API}/messages/${userId}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axios.post(`${API}/messages/${userId}`, formData);
 
       setMessages([...messages, res.data]);
       setNewMessage('');

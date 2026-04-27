@@ -18,5 +18,13 @@
       "37ca2a44-a515-42d6-9277-9ffa7a2fca56"
     ],
     "token": "c8f0b293190b20d5258fe7d551379ace"
+  },
+  {
+    "id": "ecf32ea4-86e1-4070-a100-17a43298e3b0",
+    "username": "abes",
+    "password": "123",
+    "followers": [],
+    "following": [],
+    "token": "e22063f4bb610e0f0befcaa678f34dd3"
   }
 ]

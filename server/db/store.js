@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DB_FILE = path.join(process.cwd(), 'server', 'uploaded_exams.json');
+const DB_FILE = path.join(__dirname, '..', 'uploaded_exams.json');
 
 function loadDB() {
   try {

@@ -1,20 +1,32 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 function getStore(filename) {
-  const filePath = path.join(process.cwd(), 'server', filename);
-  
-  // Ensure file exists
-  if (!fs.existsSync(filePath)) {
+  const staticPath = path.join(__dirname, '..', filename);
+  let filePath = staticPath;
+
+  // On Vercel, we use the system temp directory for writable storage
+  if (process.env.VERCEL === '1') {
+    const tmpPath = path.join(os.tmpdir(), filename);
     try {
-      fs.writeFileSync(filePath, JSON.stringify([], null, 2));
+      if (!fs.existsSync(tmpPath)) {
+        console.log(`[BacWeb] Initializing /tmp storage for ${filename}`);
+        if (fs.existsSync(staticPath)) {
+          fs.copyFileSync(staticPath, tmpPath);
+        } else {
+          fs.writeFileSync(tmpPath, JSON.stringify([], null, 2));
+        }
+      }
+      filePath = tmpPath;
     } catch (e) {
-      console.error(`Failed to create ${filename}:`, e.message);
+      console.error(`[BacWeb] Failed to setup /tmp storage for ${filename}:`, e.message);
     }
   }
 
   function load() {
     try {
+      if (!fs.existsSync(filePath)) return [];
       const data = fs.readFileSync(filePath, 'utf8');
       return JSON.parse(data);
     } catch (err) {
@@ -24,14 +36,15 @@ function getStore(filename) {
   }
 
   function save(data) {
-    if (process.env.VERCEL === '1') {
-      console.warn(`Skipping save to ${filename}: Vercel read-only filesystem.`);
-      return;
-    }
     try {
+      // We can write to /tmp on Vercel
       fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
     } catch (err) {
-      console.error(`Error saving to ${filename}:`, err.message);
+      if (process.env.VERCEL === '1') {
+        console.warn(`Vercel write failed for ${filename} (Read-only?):`, err.message);
+      } else {
+        console.error(`Error saving to ${filename}:`, err.message);
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import API from '../config/api';
 import { Bell, Check, UserPlus, Heart, MessageSquare, Reply as ReplyIcon } from 'lucide-react';
@@ -11,7 +11,7 @@ export default function Notifications() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeToast, setActiveToast] = useState(null);
   const { user } = useAuth();
-  const lastFetchedCount = useRef(0);
+  const lastFetchedCount = React.useRef(0);
 
 
   useEffect(() => {
@@ -98,12 +98,10 @@ export default function Notifications() {
           className="card shadow-2xl" 
           style={{
             position: 'absolute', top: 'calc(100% + 12px)', right: 0, 
-            width: 360, maxHeight: 520, overflowY: 'auto', 
+            width: 360, maxWidth: 'calc(100vw - 32px)', maxHeight: 520, overflowY: 'auto', 
             zIndex: 1000, padding: 0,
             border: '1px solid var(--border)',
-            background: 'rgba(14, 18, 33, 0.8)',
-            backdropFilter: 'blur(30px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(30px) saturate(180%)',
+            background: 'var(--bg-card, #0e1221)',
             borderRadius: 20,
             animation: 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
             display: 'flex', flexDirection: 'column',

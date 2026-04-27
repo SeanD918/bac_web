@@ -52,33 +52,33 @@ export default function Navbar() {
           </ul>
 
           <div className="nav-actions">
+            {user && <Notifications />}
+
             {user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Notifications />
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 8, paddingLeft: 16, borderLeft: '1px solid var(--border)' }}>
-                  <span style={{ fontSize: 14, fontWeight: 500 }}>{user.username}</span>
-                  <button onClick={logout} className="btn btn-ghost" style={{ padding: '8px 12px' }}>
-                    <LogOut size={16} />
-                  </button>
-                </div>
+              <div className="nav-user-desktop">
+                <span style={{ fontSize: 14, fontWeight: 500 }}>{user.username}</span>
+                <button onClick={logout} className="btn btn-ghost" style={{ padding: '8px 12px' }}>
+                  <LogOut size={16} />
+                </button>
               </div>
             ) : (
               <Link to="/auth" className="btn btn-primary">
                 <LogIn size={14} /> Connexion
               </Link>
             )}
-          </div>
 
-          <button
-            id="nav-mobile-btn"
-            className="nav-mobile-toggle"
-            onClick={() => setMobileOpen(v => !v)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+            <button
+              id="nav-mobile-btn"
+              className="nav-mobile-toggle"
+              onClick={() => setMobileOpen(v => !v)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
       </nav>
+
 
       {mobileOpen && (
         <nav className="nav-mobile-menu">

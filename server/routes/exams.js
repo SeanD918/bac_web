@@ -105,17 +105,27 @@ router.get('/exams', async (req, res) => {
     let exists = true;
     let correctionExists = !!e.hasCorrection;
     
-    // If it's a local file in public/uploads, check disk
+    const isVercel = process.env.VERCEL === '1';
+
+    // If it's a local file in uploads, check disk (only if not on Vercel)
     if (e.examUrl && e.examUrl.startsWith('/uploads/')) {
-      const fullPath = path.join(process.cwd(), 'client', 'public', e.examUrl);
-      exists = fs.existsSync(fullPath);
+      if (isVercel) {
+        exists = true; // Assume exists on Vercel if in DB
+      } else {
+        const fullPath = path.join(process.cwd(), 'server', 'uploads', path.basename(e.examUrl));
+        exists = fs.existsSync(fullPath);
+      }
     } else if (e.examUrl) {
       exists = await checkLink(e.examUrl);
     }
     
     if (e.correctionUrl && e.correctionUrl.startsWith('/uploads/')) {
-      const fullPath = path.join(process.cwd(), 'client', 'public', e.correctionUrl);
-      correctionExists = fs.existsSync(fullPath);
+      if (isVercel) {
+        correctionExists = true;
+      } else {
+        const fullPath = path.join(process.cwd(), 'server', 'uploads', path.basename(e.correctionUrl));
+        correctionExists = fs.existsSync(fullPath);
+      }
     } else if (e.correctionUrl) {
       correctionExists = await checkLink(e.correctionUrl);
     }
@@ -159,18 +169,31 @@ router.get('/exams/featured', async (_req, res) => {
   const featuredWithFlags = await Promise.all(featured.map(async (e) => {
     let exists = true;
     let correctionExists = !!e.hasCorrection;
+    
+    const isVercel = process.env.VERCEL === '1';
+
     if (e.examUrl && e.examUrl.startsWith('/uploads/')) {
-      const fullPath = path.join(process.cwd(), 'client', 'public', e.examUrl);
-      exists = fs.existsSync(fullPath);
+      if (isVercel) {
+        exists = true;
+      } else {
+        const fullPath = path.join(process.cwd(), 'server', 'uploads', path.basename(e.examUrl));
+        exists = fs.existsSync(fullPath);
+      }
     } else if (e.examUrl) {
       exists = await checkLink(e.examUrl);
     }
+
     if (e.correctionUrl && e.correctionUrl.startsWith('/uploads/')) {
-      const fullPath = path.join(process.cwd(), 'client', 'public', e.correctionUrl);
-      correctionExists = fs.existsSync(fullPath);
+      if (isVercel) {
+        correctionExists = true;
+      } else {
+        const fullPath = path.join(process.cwd(), 'server', 'uploads', path.basename(e.correctionUrl));
+        correctionExists = fs.existsSync(fullPath);
+      }
     } else if (e.correctionUrl) {
       correctionExists = await checkLink(e.correctionUrl);
     }
+
     return { 
       ...e, 
       exists: e.exists !== undefined ? e.exists : exists, 
