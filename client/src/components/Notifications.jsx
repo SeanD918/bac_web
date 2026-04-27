@@ -91,13 +91,14 @@ export default function Notifications() {
             position: 'absolute', top: 'calc(100% + 12px)', right: 0, 
             width: 360, maxHeight: 520, overflowY: 'auto', 
             zIndex: 1000, padding: 0,
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            background: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(25px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(25px) saturate(180%)',
+            border: '1px solid var(--border)',
+            background: 'rgba(14, 18, 33, 0.8)',
+            backdropFilter: 'blur(30px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(30px) saturate(180%)',
             borderRadius: 20,
             animation: 'slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-            display: 'flex', flexDirection: 'column'
+            display: 'flex', flexDirection: 'column',
+            color: 'var(--text)'
           }}
         >
           <div style={{ 
@@ -106,9 +107,10 @@ export default function Notifications() {
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center',
-            background: 'rgba(255, 255, 255, 0.5)'
+            background: 'rgba(255, 255, 255, 0.02)'
           }}>
-            <span style={{ fontWeight: 800, fontSize: 18, fontFamily: 'var(--font-display)' }}>Notifications</span>
+            <span style={{ fontWeight: 800, fontSize: 18, fontFamily: 'var(--font-display)', color: 'var(--text)' }}>Notifications</span>
+
             {unreadCount > 0 && (
               <span style={{ 
                 fontSize: 11, 
@@ -146,8 +148,8 @@ export default function Notifications() {
                       onClick={() => { markOneAsRead(n.id); setOpen(false); }} 
                       style={{
                         padding: '16px 20px', 
-                        borderBottom: '1px solid rgba(0,0,0,0.03)',
-                        background: n.isRead ? 'transparent' : 'rgba(59, 130, 246, 0.04)',
+                        borderBottom: '1px solid var(--border)',
+                        background: n.isRead ? 'transparent' : 'rgba(59, 130, 246, 0.08)',
                         display: 'flex', gap: 16, alignItems: 'flex-start',
                         textDecoration: 'none', color: 'inherit',
                         transition: 'all 0.2s ease',
@@ -158,19 +160,21 @@ export default function Notifications() {
                     >
                       <div style={{
                         width: 44, height: 44, borderRadius: '14px', 
-                        background: 'var(--bg-card2, #f3f4f6)', 
+                        background: 'var(--bg-card2)', 
                         display: 'flex', alignItems: 'center', justifyContent: 'center', 
                         color: 'var(--text)', fontWeight: 'bold', fontSize: 16, flexShrink: 0,
                         position: 'relative',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
                       }}>
                         {n.actorName.charAt(0).toUpperCase()}
                         <div style={{
                           position: 'absolute', bottom: -4, right: -4,
-                          background: 'white', borderRadius: '50%', padding: 4,
-                          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center'
+                          background: 'var(--bg-card)', borderRadius: '50%', padding: 4,
+                          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          border: '1px solid var(--border)'
                         }}>
+
                           {getIcon(n.type)}
                         </div>
                       </div>
@@ -218,16 +222,17 @@ export default function Notifications() {
           <div style={{ 
             padding: '12px', 
             textAlign: 'center', 
-            background: 'rgba(255, 255, 255, 0.5)',
+            background: 'rgba(255, 255, 255, 0.02)',
             borderTop: '1px solid var(--border)' 
           }}>
             <button 
               onClick={() => setOpen(false)}
-              style={{ fontSize: 12, fontWeight: 600, color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}
+              style={{ fontSize: 12, fontWeight: 600, color: '#6366f1', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               Fermer
             </button>
           </div>
+
         </div>
       )}
       
