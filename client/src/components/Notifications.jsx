@@ -30,22 +30,23 @@ export default function Notifications() {
     try {
       const res = await axios.get(`${API}/notifications`);
       const newData = res.data;
-      const currentUnseen = newData.filter(n => !n.isSeen);
+      const unseen = newData.filter(n => !n.isSeen);
       
-      // Use currentUnseen for the badge count
-      if (currentUnseen.length > lastFetchedCount.current) {
-        const latest = currentUnseen[0];
+      // If we have new notifications that we didn't have before, show a toast
+      if (unseen.length > lastFetchedCount.current) {
+        const latest = unseen[0];
         setActiveToast(latest);
-        setTimeout(() => setActiveToast(null), 5000);
+        setTimeout(() => setActiveToast(null), 5000); // Hide toast after 5s
       }
       
-      lastFetchedCount.current = currentUnseen.length;
+      lastFetchedCount.current = unseen.length;
       setNotifications(newData);
-      setUnreadCount(currentUnseen.length);
+      setUnreadCount(unseen.length);
     } catch (e) {
       console.error(e);
     }
   };
+
 
   const markAllAsSeen = async () => {
     try {

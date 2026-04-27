@@ -15,7 +15,7 @@ router.get('/', authMiddleware, (req, res) => {
   res.json(userNotifications);
 });
 
-// Mark all as SEEN (clears the badge number but keeps the highlight)
+// Mark all as seen (clears the red badge)
 router.post('/seen', authMiddleware, (req, res) => {
   const allNotifications = notificationsStore.load();
   let updated = false;
@@ -34,20 +34,39 @@ router.post('/seen', authMiddleware, (req, res) => {
   res.json({ success: true });
 });
 
-// Mark specific as read (clears the highlight)
+// Mark all as read
+router.post('/read', authMiddleware, (req, res) => {
+  const allNotifications = notificationsStore.load();
+  let updated = false;
+
+  allNotifications.forEach(n => {
+    if (n.targetUserId === req.user.id && !n.isRead) {
+      n.isRead = true;
+      n.isSeen = true; // Also mark as seen
+      updated = true;
+    }
+  });
+
+  if (updated) {
+    notificationsStore.save(allNotifications);
+  }
+  
+  res.json({ success: true });
+});
+
+// Mark specific as read
 router.post('/:id/read', authMiddleware, (req, res) => {
   const allNotifications = notificationsStore.load();
   const notif = allNotifications.find(n => n.id === req.params.id && n.targetUserId === req.user.id);
   if (notif) {
     notif.isRead = true;
-    notif.isSeen = true; // Also mark as seen if read
     notificationsStore.save(allNotifications);
   }
   res.json({ success: true });
 });
 
 
-// Helper to create notifications
+// Helper to create notifications (used internally by other routes)
 const createNotification = (targetUserId, actorName, type, postId) => {
   if (!targetUserId) return;
   const allNotifications = notificationsStore.load();
@@ -55,10 +74,10 @@ const createNotification = (targetUserId, actorName, type, postId) => {
     id: crypto.randomUUID(),
     targetUserId,
     actorName,
-    type,
+    type, // 'LIKE', 'COMMENT', 'FOLLOW'
     postId,
     isRead: false,
-    isSeen: false, // New field
+    isSeen: false,
     timestamp: new Date().toISOString()
   });
   notificationsStore.save(allNotifications);
