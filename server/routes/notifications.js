@@ -15,14 +15,14 @@ router.get('/', authMiddleware, (req, res) => {
   res.json(userNotifications);
 });
 
-// Mark all as read
-router.post('/read', authMiddleware, (req, res) => {
+// Mark all as SEEN (clears the badge number but keeps the highlight)
+router.post('/seen', authMiddleware, (req, res) => {
   const allNotifications = notificationsStore.load();
   let updated = false;
 
   allNotifications.forEach(n => {
-    if (n.targetUserId === req.user.id && !n.isRead) {
-      n.isRead = true;
+    if (n.targetUserId === req.user.id && !n.isSeen) {
+      n.isSeen = true;
       updated = true;
     }
   });
@@ -34,19 +34,20 @@ router.post('/read', authMiddleware, (req, res) => {
   res.json({ success: true });
 });
 
-// Mark specific as read
+// Mark specific as read (clears the highlight)
 router.post('/:id/read', authMiddleware, (req, res) => {
   const allNotifications = notificationsStore.load();
   const notif = allNotifications.find(n => n.id === req.params.id && n.targetUserId === req.user.id);
   if (notif) {
     notif.isRead = true;
+    notif.isSeen = true; // Also mark as seen if read
     notificationsStore.save(allNotifications);
   }
   res.json({ success: true });
 });
 
 
-// Helper to create notifications (used internally by other routes)
+// Helper to create notifications
 const createNotification = (targetUserId, actorName, type, postId) => {
   if (!targetUserId) return;
   const allNotifications = notificationsStore.load();
@@ -54,9 +55,10 @@ const createNotification = (targetUserId, actorName, type, postId) => {
     id: crypto.randomUUID(),
     targetUserId,
     actorName,
-    type, // 'LIKE', 'COMMENT', 'FOLLOW'
+    type,
     postId,
     isRead: false,
+    isSeen: false, // New field
     timestamp: new Date().toISOString()
   });
   notificationsStore.save(allNotifications);

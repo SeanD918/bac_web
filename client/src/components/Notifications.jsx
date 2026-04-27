@@ -30,30 +30,27 @@ export default function Notifications() {
     try {
       const res = await axios.get(`${API}/notifications`);
       const newData = res.data;
-      const currentUnread = newData.filter(n => !n.isRead);
+      const currentUnseen = newData.filter(n => !n.isSeen);
       
-      // If we have new unread notifications that we didn't have before, show a toast
-      if (currentUnread.length > lastFetchedCount.current) {
-        const latest = currentUnread[0];
+      // Use currentUnseen for the badge count
+      if (currentUnseen.length > lastFetchedCount.current) {
+        const latest = currentUnseen[0];
         setActiveToast(latest);
-        setTimeout(() => setActiveToast(null), 5000); // Hide toast after 5s
+        setTimeout(() => setActiveToast(null), 5000);
       }
       
-      lastFetchedCount.current = currentUnread.length;
+      lastFetchedCount.current = currentUnseen.length;
       setNotifications(newData);
-      setUnreadCount(currentUnread.length);
+      setUnreadCount(currentUnseen.length);
     } catch (e) {
       console.error(e);
     }
   };
 
-
-  const markAllAsRead = async () => {
+  const markAllAsSeen = async () => {
     try {
-      await axios.post(`${API}/notifications/read`);
+      await axios.post(`${API}/notifications/seen`);
       setUnreadCount(0);
-      // We don't update the local notifications list to 'read' yet 
-      // so the user still sees the blue highlights until they click them
     } catch (e) {
       console.error(e);
     }
@@ -72,7 +69,7 @@ export default function Notifications() {
     const nextState = !open;
     setOpen(nextState);
     if (nextState && unreadCount > 0) {
-      markAllAsRead();
+      markAllAsSeen();
     }
   };
 
