@@ -8,32 +8,45 @@ import { Link } from 'react-router-dom';
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
-  const [hasNewSinceOpen, setHasNewSinceOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [activeToast, setActiveToast] = useState(null);
   const { user } = useAuth();
+  const lastFetchedCount = useRef(0);
+
 
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 10000);
+      const interval = setInterval(fetchNotifications, 3000); // Poll every 3s for "real-time" feel
       return () => clearInterval(interval);
     }
   }, [user]);
 
-  useEffect(() => {
-    const unread = notifications.filter(n => !n.isRead);
-    if (unread.length > 0 && !open) {
-      setHasNewSinceOpen(true);
-    }
-  }, [notifications, open]);
+
+  // Removed unread check effect in favor of logic in fetchNotifications
+
 
   const fetchNotifications = async () => {
     try {
       const res = await axios.get(`${API}/notifications`);
-      setNotifications(res.data);
+      const newData = res.data;
+      const currentUnread = newData.filter(n => !n.isRead);
+      
+      // If we have new unread notifications that we didn't have before, show a toast
+      if (currentUnread.length > lastFetchedCount.current) {
+        const latest = currentUnread[0];
+        setActiveToast(latest);
+        setTimeout(() => setActiveToast(null), 5000); // Hide toast after 5s
+      }
+      
+      lastFetchedCount.current = currentUnread.length;
+      setNotifications(newData);
+      setUnreadCount(currentUnread.length);
     } catch (e) {
       console.error(e);
     }
   };
+
 
   const markOneAsRead = async (id) => {
     try {
@@ -45,13 +58,9 @@ export default function Notifications() {
   };
 
   const toggleDropdown = () => {
-    if (!open) {
-      setHasNewSinceOpen(false);
-    }
     setOpen(!open);
   };
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const getIcon = (type) => {
     switch (type) {
@@ -235,10 +244,41 @@ export default function Notifications() {
 
         </div>
       )}
+
+      {/* Real-time Toast Notification Popup */}
+      {activeToast && (
+        <div style={{
+          position: 'fixed', bottom: 30, left: 30, 
+          zIndex: 9999, background: 'var(--bg-card)', 
+          border: '1px solid var(--accent)', borderRadius: 16,
+          padding: '12px 20px', display: 'flex', gap: 12, alignItems: 'center',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+          animation: 'toastPop 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+          cursor: 'pointer'
+        }} onClick={() => { setActiveToast(null); setOpen(true); }}>
+          <div style={{ 
+            width: 32, height: 32, borderRadius: '50%', 
+            background: 'var(--accent-grad)', display: 'flex', 
+            alignItems: 'center', justifyContent: 'center', color: 'white' 
+          }}>
+            {getIcon(activeToast.type)}
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 'bold' }}>Nouvelle interaction !</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              {activeToast.actorName} {activeToast.type === 'LIKE' ? 'a aimé votre post' : 'a interagi avec vous'}
+            </div>
+          </div>
+        </div>
+      )}
       
       <style>{`
         @keyframes slideDown {
           from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastPop {
+          from { opacity: 0; transform: translateY(40px) scale(0.8); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .notif-item:hover {
@@ -257,6 +297,7 @@ export default function Notifications() {
         }
       `}</style>
     </div>
+
 
   );
 }
