@@ -50,7 +50,7 @@
     "actorName": "abes",
     "type": "LIKE_REPLY",
     "postId": "9e84f581-335d-449c-83bf-e1836987dd7f",
-    "isRead": false,
+    "isRead": true,
     "timestamp": "2026-04-27T13:48:51.577Z"
   },
   {
@@ -59,7 +59,7 @@
     "actorName": "abes",
     "type": "REPLY",
     "postId": "9e84f581-335d-449c-83bf-e1836987dd7f",
-    "isRead": false,
+    "isRead": true,
     "timestamp": "2026-04-27T13:49:07.447Z"
   }
 ]

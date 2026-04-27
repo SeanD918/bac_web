@@ -48,6 +48,17 @@ export default function Notifications() {
   };
 
 
+  const markAllAsRead = async () => {
+    try {
+      await axios.post(`${API}/notifications/read`);
+      setUnreadCount(0);
+      // We don't update the local notifications list to 'read' yet 
+      // so the user still sees the blue highlights until they click them
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const markOneAsRead = async (id) => {
     try {
       await axios.post(`${API}/notifications/${id}/read`);
@@ -58,7 +69,11 @@ export default function Notifications() {
   };
 
   const toggleDropdown = () => {
-    setOpen(!open);
+    const nextState = !open;
+    setOpen(nextState);
+    if (nextState && unreadCount > 0) {
+      markAllAsRead();
+    }
   };
 
 
