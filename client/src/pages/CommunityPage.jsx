@@ -393,19 +393,21 @@ export default function CommunityPage() {
                       <div key={idx}>
                         {m.type === 'image' ? (
                           <img 
-                            src={`${API.replace('/api', '')}${m.url}`} 
+                            src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                             alt={`Attachment ${idx + 1}`} 
                             style={{ width: '100%', borderRadius: 12, border: '1px solid var(--border)', cursor: 'pointer', objectFit: 'cover', height: post.media.length > 1 ? '200px' : 'auto' }}
-                            onClick={() => window.open(`${API.replace('/api', '')}${m.url}`, '_blank')}
+                            onClick={() => window.open(m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`, '_blank')}
                           />
+
                         ) : (
                           <a 
-                            href={`${API.replace('/api', '')}${m.url}`} 
+                            href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="card"
                             style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'var(--surface-lowest)', textDecoration: 'none', border: '1px solid var(--border)', height: '100%' }}
                           >
+
                             <FileText size={32} color="#ef4444" />
                             <div style={{ flex: 1 }}>
                               <div style={{ fontWeight: 'bold', color: 'var(--text)', fontSize: 14 }}>{m.name || 'PDF Document'}</div>
@@ -462,13 +464,15 @@ export default function CommunityPage() {
                                           <div key={idx} style={{ maxWidth: '100%' }}>
                                             {m.type === 'image' ? (
                                               <img 
-                                                src={`${API.replace('/api', '')}${m.url}`} 
+                                                src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                                                 alt="comment attachment" 
                                                 style={{ maxWidth: '120px', borderRadius: 8, border: '1px solid var(--border)', cursor: 'pointer' }}
-                                                onClick={() => window.open(`${API.replace('/api', '')}${m.url}`, '_blank')}
+                                                onClick={() => window.open(m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`, '_blank')}
                                               />
+
                                             ) : (
-                                              <a href={`${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'var(--bg-card2)', borderRadius: 8, fontSize: 11, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
+                                              <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'var(--bg-card2)', borderRadius: 8, fontSize: 11, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
+
                                                 <FileText size={14} color="#ef4444" />
                                                 <span style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
                                               </a>
@@ -526,13 +530,15 @@ export default function CommunityPage() {
                                                       <div key={idx}>
                                                         {m.type === 'image' ? (
                                                           <img 
-                                                            src={`${API.replace('/api', '')}${m.url}`} 
+                                                            src={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} 
                                                             alt="reply attachment" 
                                                             style={{ maxWidth: '100px', borderRadius: 6, border: '1px solid var(--border)', cursor: 'pointer' }}
-                                                            onClick={() => window.open(`${API.replace('/api', '')}${m.url}`, '_blank')}
+                                                            onClick={() => window.open(m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`, '_blank')}
                                                           />
+
                                                         ) : (
-                                                          <a href={`${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: 'var(--surface-lowest)', borderRadius: 6, fontSize: 10, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
+                                                          <a href={m.url.startsWith('data:') ? m.url : `${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: 'var(--surface-lowest)', borderRadius: 6, fontSize: 10, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
+
                                                             <FileText size={12} color="#ef4444" />
                                                             <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
                                                           </a>

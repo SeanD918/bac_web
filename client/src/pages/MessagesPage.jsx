@@ -12,10 +12,11 @@ export default function MessagesPage() {
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [filePreview, setFilePreview] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
+
   const [targetUser, setTargetUser] = useState(null);
   const messagesEndRef = useRef(null);
 
@@ -55,36 +56,28 @@ export default function MessagesPage() {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
     const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-    if (!allowed.includes(file.type)) {
-      alert('Only PDF and image files are allowed');
-      return;
-    }
-
-    setSelectedFile(file);
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => setFilePreview(reader.result);
-      reader.readAsDataURL(file);
-    } else {
-      setFilePreview('pdf');
-    }
+    const validFiles = files.filter(f => allowed.includes(f.type)).slice(0, 5);
+    setSelectedFiles(validFiles);
+    const newPrevs = validFiles.map(file => {
+      if (file.type.startsWith('image/')) return { type: 'image', url: URL.createObjectURL(file) };
+      return { type: 'pdf', name: file.name };
+    });
+    setPreviews(newPrevs);
   };
+
 
   const handleSend = async (e) => {
     if (e) e.preventDefault();
-    if (!newMessage.trim() && !selectedFile) return;
+    if (!newMessage.trim() && selectedFiles.length === 0) return;
 
     setIsUploading(true);
     try {
       const formData = new FormData();
       formData.append('content', newMessage);
-      if (selectedFile) {
-        formData.append('media', selectedFile);
-      }
+      selectedFiles.forEach(f => formData.append('media', f));
 
       const res = await axios.post(`${API}/messages/${userId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -92,8 +85,8 @@ export default function MessagesPage() {
 
       setMessages([...messages, res.data]);
       setNewMessage('');
-      setSelectedFile(null);
-      setFilePreview(null);
+      setSelectedFiles([]);
+      setPreviews([]);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (e) {
       console.error(e);
@@ -102,6 +95,7 @@ export default function MessagesPage() {
       setIsUploading(false);
     }
   };
+
 
 
   if (!user || !targetUser) return null;
@@ -141,38 +135,43 @@ export default function MessagesPage() {
                 flexDirection: 'column',
                 gap: 8
               }}>
-                {m.mediaUrl && (
-                  <div style={{ marginBottom: m.content ? 4 : 0 }}>
-                    {m.mediaType === 'image' ? (
-                      <img 
-                        src={`${API.replace('/api', '')}${m.mediaUrl}`} 
-                        alt="Shared media" 
-                        style={{ maxWidth: '100%', borderRadius: 8, cursor: 'pointer', border: isMe ? 'none' : '1px solid var(--border)' }}
-                        onClick={() => window.open(`${API.replace('/api', '')}${m.mediaUrl}`, '_blank')}
-                      />
-                    ) : (
-                      <a 
-                        href={`${API.replace('/api', '')}${m.mediaUrl}`} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: 10, 
-                          padding: '8px 12px', 
-                          background: isMe ? 'rgba(255,255,255,0.1)' : 'var(--surface-lowest)', 
-                          borderRadius: 8, 
-                          textDecoration: 'none',
-                          color: isMe ? 'white' : 'var(--text)',
-                          border: isMe ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--border)'
-                        }}
-                      >
-                        <FileText size={24} color={isMe ? 'white' : '#ef4444'} />
-                        <span style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.mediaName || 'Document'}</span>
-                      </a>
-                    )}
+                {(m.media || (m.mediaUrl ? [{url: m.mediaUrl, type: m.mediaType, name: m.mediaName}] : [])).length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: m.content ? 8 : 0 }}>
+                    {(m.media || [{url: m.mediaUrl, type: m.mediaType, name: m.mediaName}]).map((file, idx) => (
+                      <div key={idx}>
+                        {file.type === 'image' ? (
+                          <img 
+                            src={file.url.startsWith('data:') ? file.url : `${API.replace('/api', '')}${file.url}`} 
+                            alt="Shared media" 
+                            style={{ maxWidth: '100%', borderRadius: 8, cursor: 'pointer', border: isMe ? 'none' : '1px solid var(--border)' }}
+                            onClick={() => window.open(file.url.startsWith('data:') ? file.url : `${API.replace('/api', '')}${file.url}`, '_blank')}
+                          />
+                        ) : (
+                          <a 
+                            href={file.url.startsWith('data:') ? file.url : `${API.replace('/api', '')}${file.url}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: 10, 
+                              padding: '8px 12px', 
+                              background: isMe ? 'rgba(255,255,255,0.1)' : 'var(--surface-lowest)', 
+                              borderRadius: 8, 
+                              textDecoration: 'none',
+                              color: isMe ? 'white' : 'var(--text)',
+                              border: isMe ? '1px solid rgba(255,255,255,0.2)' : '1px solid var(--border)'
+                            }}
+                          >
+                            <FileText size={24} color={isMe ? 'white' : '#ef4444'} />
+                            <span style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name || 'Document'}</span>
+                          </a>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
+
                 {m.content && <div>{m.content}</div>}
               </div>
             );
@@ -183,25 +182,34 @@ export default function MessagesPage() {
 
         {/* Input Area */}
         <div style={{ padding: 16, borderTop: '1px solid var(--border)' }}>
-          {filePreview && (
-            <div style={{ position: 'relative', width: 'fit-content', marginBottom: 12, marginLeft: 8 }}>
-              {filePreview === 'pdf' ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', background: 'var(--bg-card2)', borderRadius: 8, border: '1px solid var(--border)' }}>
-                  <FileText size={20} color="#ef4444" />
-                  <span style={{ fontSize: 12, maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedFile?.name}</span>
+          {previews.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12, marginLeft: 8 }}>
+              {previews.map((p, i) => (
+                <div key={i} style={{ position: 'relative' }}>
+                  {p.type === 'image' ? (
+                    <img src={p.url} alt="Preview" style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border)' }} />
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'var(--bg-card2)', borderRadius: 6, border: '1px solid var(--border)' }}>
+                      <FileText size={16} color="#ef4444" />
+                      <span style={{ fontSize: 10, maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                    </div>
+                  )}
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const newF = [...selectedFiles]; newF.splice(i, 1); setSelectedFiles(newF);
+                      const newP = [...previews]; newP.splice(i, 1); setPreviews(newP);
+                      if (newF.length === 0 && fileInputRef.current) fileInputRef.current.value = '';
+                    }}
+                    style={{ position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 16, height: 16, cursor: 'pointer', fontSize: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <X size={10} />
+                  </button>
                 </div>
-              ) : (
-                <img src={filePreview} alt="Preview" style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border)' }} />
-              )}
-              <button 
-                type="button"
-                onClick={() => { setSelectedFile(null); setFilePreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <X size={12} />
-              </button>
+              ))}
             </div>
           )}
+
           <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input 
               type="file" 
@@ -227,7 +235,8 @@ export default function MessagesPage() {
               className="search-input"
               style={{ flex: 1 }}
             />
-            <button type="submit" className="btn btn-primary" disabled={isUploading || (!newMessage.trim() && !selectedFile)}>
+            <button type="submit" className="btn btn-primary" disabled={isUploading || (!newMessage.trim() && selectedFiles.length === 0)}>
+
               {isUploading ? '...' : <Send size={18} />}
             </button>
           </form>
