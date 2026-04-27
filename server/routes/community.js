@@ -1,8 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const getStore = require('../db/jsonStore');
 const { authMiddleware } = require('./auth');
+
+// ─── Multer config for Community Media ───────────────────────────────────────
+const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  try { fs.mkdirSync(UPLOADS_DIR, { recursive: true }); } catch (e) {}
+}
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = path.basename(file.originalname, ext).replace(/\s+/g, '_');
+    cb(null, `community_${Date.now()}_${crypto.randomUUID().slice(0, 8)}${ext}`);
+  },
+});
+
+const fileFilter = (_req, file, cb) => {
+  const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+  if (allowed.includes(file.mimetype)) cb(null, true);
+  else cb(new Error('Only PDF and image files are allowed'), false);
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max for community
+});
+
 
 const postsStore = getStore('community_posts.json');
 
@@ -13,26 +44,33 @@ router.get('/posts', authMiddleware, (req, res) => {
   res.json(posts);
 });
 
-router.post('/posts', authMiddleware, (req, res) => {
+router.post('/posts', authMiddleware, upload.single('media'), (req, res) => {
   const { content, tag } = req.body;
-  if (!content) return res.status(400).json({ error: 'Content required' });
+  if (!content && !req.file) return res.status(400).json({ error: 'Content or media required' });
 
   const posts = postsStore.load();
   const newPost = {
     id: crypto.randomUUID(),
     authorId: req.user.id,
     authorName: req.user.username,
-    content,
+    content: content || '',
     tag: tag || 'General',
     likes: [],
     comments: [],
     timestamp: new Date().toISOString()
   };
 
+  if (req.file) {
+    newPost.mediaUrl = `/uploads/${req.file.filename}`;
+    newPost.mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'pdf';
+    newPost.mediaName = req.file.originalname;
+  }
+
   posts.unshift(newPost);
   postsStore.save(posts);
   res.json(newPost);
 });
+
 
 router.post('/posts/:id/like', authMiddleware, (req, res) => {
   const posts = postsStore.load();

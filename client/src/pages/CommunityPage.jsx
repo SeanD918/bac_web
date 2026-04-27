@@ -3,7 +3,8 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import API from '../config/api';
-import { MessageSquare, Heart, Send, UserPlus, UserCheck, MessageCircle, Reply as ReplyIcon } from 'lucide-react';
+import { MessageSquare, Heart, Send, UserPlus, UserCheck, MessageCircle, Reply as ReplyIcon, Image as ImageIcon, FileText, X } from 'lucide-react';
+
 
 export default function CommunityPage() {
   const { user, followUser } = useAuth();
@@ -11,7 +12,12 @@ export default function CommunityPage() {
   const location = useLocation();
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
   const [commentInputs, setCommentInputs] = useState({});
+
   const [replyInputs, setReplyInputs] = useState({});
   const [activeReplyId, setActiveReplyId] = useState(null);
   const postRefs = useRef({});
@@ -48,17 +54,55 @@ export default function CommunityPage() {
     }
   };
 
-  const handlePostSubmit = async (e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    if (!newPost.trim()) return;
-    try {
-      const res = await axios.post(`${API}/community/posts`, { content: newPost });
-      setPosts([res.data, ...posts]);
-      setNewPost('');
-    } catch (e) {
-      console.error(e);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.type)) {
+      alert('Only PDF and image files are allowed');
+      return;
+    }
+
+    setSelectedFile(file);
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => setFilePreview(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      setFilePreview('pdf');
     }
   };
+
+  const handlePostSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!newPost.trim() && !selectedFile) return;
+    
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('content', newPost);
+      if (selectedFile) {
+        formData.append('media', selectedFile);
+      }
+
+      const res = await axios.post(`${API}/community/posts`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      setPosts([res.data, ...posts]);
+      setNewPost('');
+      setSelectedFile(null);
+      setFilePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (e) {
+      console.error(e);
+      alert(e.response?.data?.error || 'Failed to post');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
 
   const handleLike = async (postId) => {
     try {
@@ -160,10 +204,58 @@ export default function CommunityPage() {
               className="search-input"
               style={{ resize: 'vertical', minHeight: 80, padding: 16, background: 'var(--surface-lowest)' }}
             />
-            <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end', padding: '8px 24px' }}>
-              <Send size={16} /> Post
-            </button>
+
+            {filePreview && (
+              <div style={{ position: 'relative', width: 'fit-content', marginTop: 8 }}>
+                {filePreview === 'pdf' ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--bg-card2)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                    <FileText size={24} color="#ef4444" />
+                    <span style={{ fontSize: 13, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedFile?.name}</span>
+                  </div>
+                ) : (
+                  <img src={filePreview} alt="Preview" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border)' }} />
+                )}
+                <button 
+                  type="button"
+                  onClick={() => { setSelectedFile(null); setFilePreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                  style={{ position: 'absolute', top: -10, right: -10, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleFileChange} 
+                  accept="image/*,application/pdf" 
+                  style={{ display: 'none' }} 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="btn btn-ghost"
+                  style={{ color: 'var(--text-muted)', padding: '8px' }}
+                  title="Add Image or PDF"
+                >
+                  <ImageIcon size={20} style={{ marginRight: 6 }} />
+                  <span style={{ fontSize: 13 }}>Media</span>
+                </button>
+              </div>
+              <button 
+                type="submit" 
+                className="btn btn-primary" 
+                disabled={isUploading || (!newPost.trim() && !selectedFile)}
+                style={{ padding: '8px 24px' }}
+              >
+                {isUploading ? 'Posting...' : <><Send size={16} /> Post</>}
+              </button>
+            </div>
           </form>
+
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -211,9 +303,37 @@ export default function CommunityPage() {
                   )}
                 </div>
 
-                <p style={{ marginBottom: 24, fontSize: 15, lineHeight: 1.6, color: 'var(--text)' }}>
+                <p style={{ marginBottom: post.mediaUrl ? 16 : 24, fontSize: 15, lineHeight: 1.6, color: 'var(--text)' }}>
                   {post.content}
                 </p>
+
+                {post.mediaUrl && (
+                  <div style={{ marginBottom: 24 }}>
+                    {post.mediaType === 'image' ? (
+                      <img 
+                        src={`${API.replace('/api', '')}${post.mediaUrl}`} 
+                        alt="Post attachment" 
+                        style={{ maxWidth: '100%', borderRadius: 12, border: '1px solid var(--border)', cursor: 'pointer' }}
+                        onClick={() => window.open(`${API.replace('/api', '')}${post.mediaUrl}`, '_blank')}
+                      />
+                    ) : (
+                      <a 
+                        href={`${API.replace('/api', '')}${post.mediaUrl}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="card"
+                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'var(--surface-lowest)', textDecoration: 'none', border: '1px solid var(--border)' }}
+                      >
+                        <FileText size={32} color="#ef4444" />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 'bold', color: 'var(--text)', fontSize: 14 }}>{post.mediaName || 'PDF Document'}</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Click to view document</div>
+                        </div>
+                      </a>
+                    )}
+                  </div>
+                )}
+
                 
                 <div style={{ display: 'flex', gap: 16, marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
                   <button 
