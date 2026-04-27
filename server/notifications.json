@@ -35,7 +35,8 @@
     "type": "LIKE",
     "postId": "e6ea321e-fc8d-468f-be09-678ec7a6966c",
     "isRead": false,
-    "timestamp": "2026-04-27T13:46:36.333Z"
+    "timestamp": "2026-04-27T13:46:36.333Z",
+    "isSeen": true
   },
   {
     "id": "c29143eb-69fe-4d81-bf5d-fb23c31d8edf",
@@ -44,7 +45,8 @@
     "type": "COMMENT",
     "postId": "e6ea321e-fc8d-468f-be09-678ec7a6966c",
     "isRead": false,
-    "timestamp": "2026-04-27T13:47:03.847Z"
+    "timestamp": "2026-04-27T13:47:03.847Z",
+    "isSeen": true
   },
   {
     "id": "ea6902c8-a832-4423-947d-9d3606880fa9",
@@ -65,5 +67,25 @@
     "isRead": true,
     "timestamp": "2026-04-27T13:49:07.447Z",
     "isSeen": true
+  },
+  {
+    "id": "daec0348-91eb-49b6-b6a5-e055afda5a30",
+    "targetUserId": "ecf32ea4-86e1-4070-a100-17a43298e3b0",
+    "actorName": "raya",
+    "type": "LIKE_REPLY",
+    "postId": "9e84f581-335d-449c-83bf-e1836987dd7f",
+    "isRead": false,
+    "isSeen": true,
+    "timestamp": "2026-04-27T15:38:30.314Z"
+  },
+  {
+    "id": "74ab186a-d8dc-453f-a473-707668dc5d79",
+    "targetUserId": "ecf32ea4-86e1-4070-a100-17a43298e3b0",
+    "actorName": "raya",
+    "type": "REPLY",
+    "postId": "9e84f581-335d-449c-83bf-e1836987dd7f",
+    "isRead": false,
+    "isSeen": true,
+    "timestamp": "2026-04-27T15:38:38.117Z"
   }
 ]
