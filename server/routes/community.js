@@ -97,9 +97,11 @@ router.post('/posts/:id/like', authMiddleware, (req, res) => {
   res.json(post);
 });
 
-router.post('/posts/:id/comment', authMiddleware, (req, res) => {
+router.post('/posts/:id/comment', authMiddleware, upload.array('media', 5), (req, res) => {
   const { content } = req.body;
-  if (!content) return res.status(400).json({ error: 'Comment required' });
+  if (!content && (!req.files || req.files.length === 0)) {
+    return res.status(400).json({ error: 'Comment content or media required' });
+  }
 
   const posts = postsStore.load();
   const post = posts.find(p => p.id === req.params.id);
@@ -109,11 +111,20 @@ router.post('/posts/:id/comment', authMiddleware, (req, res) => {
     id: crypto.randomUUID(),
     authorId: req.user.id,
     authorName: req.user.username,
-    content,
+    content: content || '',
     likes: [],
     replies: [],
+    media: [],
     timestamp: new Date().toISOString()
   };
+
+  if (req.files && req.files.length > 0) {
+    comment.media = req.files.map(file => ({
+      url: `/uploads/${file.filename}`,
+      type: file.mimetype.startsWith('image/') ? 'image' : 'pdf',
+      name: file.originalname
+    }));
+  }
 
   post.comments.push(comment);
   postsStore.save(posts);
@@ -124,6 +135,7 @@ router.post('/posts/:id/comment', authMiddleware, (req, res) => {
 
   res.json(post);
 });
+
 
 router.post('/posts/:postId/comments/:commentId/like', authMiddleware, (req, res) => {
   const posts = postsStore.load();
@@ -149,9 +161,11 @@ router.post('/posts/:postId/comments/:commentId/like', authMiddleware, (req, res
   res.json(post);
 });
 
-router.post('/posts/:postId/comments/:commentId/reply', authMiddleware, (req, res) => {
+router.post('/posts/:postId/comments/:commentId/reply', authMiddleware, upload.array('media', 5), (req, res) => {
   const { content, replyTo } = req.body;
-  if (!content) return res.status(400).json({ error: 'Reply required' });
+  if (!content && (!req.files || req.files.length === 0)) {
+    return res.status(400).json({ error: 'Reply content or media required' });
+  }
 
   const posts = postsStore.load();
   const post = posts.find(p => p.id === req.params.postId);
@@ -164,17 +178,25 @@ router.post('/posts/:postId/comments/:commentId/reply', authMiddleware, (req, re
     id: crypto.randomUUID(),
     authorId: req.user.id,
     authorName: req.user.username,
-    content,
-    replyTo: replyTo || null, // Name of the user being replied to
+    content: content || '',
+    replyTo: replyTo || null,
     likes: [],
+    media: [],
     timestamp: new Date().toISOString()
   };
+
+  if (req.files && req.files.length > 0) {
+    reply.media = req.files.map(file => ({
+      url: `/uploads/${file.filename}`,
+      type: file.mimetype.startsWith('image/') ? 'image' : 'pdf',
+      name: file.originalname
+    }));
+  }
 
   if (!comment.replies) comment.replies = [];
   comment.replies.push(reply);
   postsStore.save(posts);
 
-  // Notify the comment author
   if (comment.authorId !== req.user.id) {
     createNotification(comment.authorId, req.user.username, 'REPLY', post.id);
   }
@@ -182,9 +204,12 @@ router.post('/posts/:postId/comments/:commentId/reply', authMiddleware, (req, re
   res.json(post);
 });
 
-router.post('/posts/:postId/comments/:commentId/replies/:replyId/reply', authMiddleware, (req, res) => {
+
+router.post('/posts/:postId/comments/:commentId/replies/:replyId/reply', authMiddleware, upload.array('media', 5), (req, res) => {
   const { content } = req.body;
-  if (!content) return res.status(400).json({ error: 'Reply required' });
+  if (!content && (!req.files || req.files.length === 0)) {
+    return res.status(400).json({ error: 'Reply content or media required' });
+  }
 
   const posts = postsStore.load();
   const post = posts.find(p => p.id === req.params.postId);
@@ -200,22 +225,31 @@ router.post('/posts/:postId/comments/:commentId/replies/:replyId/reply', authMid
     id: crypto.randomUUID(),
     authorId: req.user.id,
     authorName: req.user.username,
-    content,
+    content: content || '',
     replyTo: targetReply.authorName,
     likes: [],
+    media: [],
     timestamp: new Date().toISOString()
   };
+
+  if (req.files && req.files.length > 0) {
+    reply.media = req.files.map(file => ({
+      url: `/uploads/${file.filename}`,
+      type: file.mimetype.startsWith('image/') ? 'image' : 'pdf',
+      name: file.originalname
+    }));
+  }
 
   comment.replies.push(reply);
   postsStore.save(posts);
 
-  // Notify the reply author
   if (targetReply.authorId !== req.user.id) {
     createNotification(targetReply.authorId, req.user.username, 'REPLY', post.id);
   }
 
   res.json(post);
 });
+
 
 
 router.post('/posts/:postId/comments/:commentId/replies/:replyId/like', authMiddleware, (req, res) => {

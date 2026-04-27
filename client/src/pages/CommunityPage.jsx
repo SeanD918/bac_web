@@ -18,9 +18,17 @@ export default function CommunityPage() {
   const fileInputRef = useRef(null);
 
   const [commentInputs, setCommentInputs] = useState({});
+  const [commentFiles, setCommentFiles] = useState({});
+  const [commentPreviews, setCommentPreviews] = useState({});
+  const commentFileInputRefs = useRef({});
 
   const [replyInputs, setReplyInputs] = useState({});
+  const [replyFiles, setReplyFiles] = useState({});
+  const [replyPreviews, setReplyPreviews] = useState({});
+  const replyFileInputRefs = useRef({});
+
   const [activeReplyId, setActiveReplyId] = useState(null);
+
   const postRefs = useRef({});
 
   useEffect(() => {
@@ -105,9 +113,6 @@ export default function CommunityPage() {
       setIsUploading(false);
     }
   };
- bitumen
-
-
 
   const handleLike = async (postId) => {
     try {
@@ -118,61 +123,94 @@ export default function CommunityPage() {
     }
   };
 
+  const handleCommentFileChange = (e, postId) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    const validFiles = files.filter(f => allowed.includes(f.type)).slice(0, 5);
+    setCommentFiles({ ...commentFiles, [postId]: validFiles });
+    const newPrevs = validFiles.map(file => {
+      if (file.type.startsWith('image/')) return { type: 'image', url: URL.createObjectURL(file) };
+      return { type: 'pdf', name: file.name };
+    });
+    setCommentPreviews({ ...commentPreviews, [postId]: newPrevs });
+  };
+
+  const handleReplyFileChange = (e, id) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    const validFiles = files.filter(f => allowed.includes(f.type)).slice(0, 5);
+    setReplyFiles({ ...replyFiles, [id]: validFiles });
+    const newPrevs = validFiles.map(file => {
+      if (file.type.startsWith('image/')) return { type: 'image', url: URL.createObjectURL(file) };
+      return { type: 'pdf', name: file.name };
+    });
+    setReplyPreviews({ ...replyPreviews, [id]: newPrevs });
+  };
+
   const handleCommentSubmit = async (postId) => {
     const content = commentInputs[postId];
-    if (!content?.trim()) return;
+    const files = commentFiles[postId] || [];
+    if (!content?.trim() && files.length === 0) return;
+    setIsUploading(true);
     try {
-      const res = await axios.post(`${API}/community/posts/${postId}/comment`, { content });
+      const formData = new FormData();
+      formData.append('content', content || '');
+      files.forEach(f => formData.append('media', f));
+      const res = await axios.post(`${API}/community/posts/${postId}/comment`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setPosts(posts.map(p => p.id === postId ? res.data : p));
       setCommentInputs({ ...commentInputs, [postId]: '' });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleCommentLike = async (postId, commentId) => {
-    try {
-      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/like`);
-      setPosts(posts.map(p => p.id === postId ? res.data : p));
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleReplyLike = async (postId, commentId, replyId) => {
-    try {
-      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/replies/${replyId}/like`);
-      setPosts(posts.map(p => p.id === postId ? res.data : p));
-    } catch (e) {
-      console.error(e);
-    }
+      setCommentFiles({ ...commentFiles, [postId]: [] });
+      setCommentPreviews({ ...commentPreviews, [postId]: [] });
+    } catch (e) { console.error(e); }
+    finally { setIsUploading(false); }
   };
 
   const handleReplySubmit = async (postId, commentId) => {
     const content = replyInputs[commentId];
-    if (!content?.trim()) return;
+    const files = replyFiles[commentId] || [];
+    if (!content?.trim() && files.length === 0) return;
+    setIsUploading(true);
     try {
-      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/reply`, { content });
+      const formData = new FormData();
+      formData.append('content', content || '');
+      files.forEach(f => formData.append('media', f));
+      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/reply`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setPosts(posts.map(p => p.id === postId ? res.data : p));
       setReplyInputs({ ...replyInputs, [commentId]: '' });
+      setReplyFiles({ ...replyFiles, [commentId]: [] });
+      setReplyPreviews({ ...replyPreviews, [commentId]: [] });
       setActiveReplyId(null);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
+    finally { setIsUploading(false); }
   };
 
   const handleNestedReplySubmit = async (postId, commentId, replyId) => {
     const content = replyInputs[replyId];
-    if (!content?.trim()) return;
+    const files = replyFiles[replyId] || [];
+    if (!content?.trim() && files.length === 0) return;
+    setIsUploading(true);
     try {
-      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/replies/${replyId}/reply`, { content });
+      const formData = new FormData();
+      formData.append('content', content || '');
+      files.forEach(f => formData.append('media', f));
+      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/replies/${replyId}/reply`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setPosts(posts.map(p => p.id === postId ? res.data : p));
       setReplyInputs({ ...replyInputs, [replyId]: '' });
+      setReplyFiles({ ...replyFiles, [replyId]: [] });
+      setReplyPreviews({ ...replyPreviews, [replyId]: [] });
       setActiveReplyId(null);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
+    finally { setIsUploading(false); }
   };
+
 
   if (!user) return null;
 
@@ -382,7 +420,6 @@ export default function CommunityPage() {
                   {post.comments.length > 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 16 }}>
                       {post.comments.map(c => {
-                        const hasLikedComment = c.likes?.includes(user.id);
                         return (
                           <div key={c.id} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             <div style={{ display: 'flex', gap: 12 }}>
@@ -394,15 +431,35 @@ export default function CommunityPage() {
                                 {c.authorName.charAt(0).toUpperCase()}
                               </div>
                               <div style={{ flex: 1 }}>
-                                <div style={{ background: 'var(--surface-lowest)', padding: '10px 14px', borderRadius: 16, borderTopLeftRadius: 4 }}>
-                                  <div style={{ fontWeight: 'bold', fontSize: 13, marginBottom: 2 }}>{c.authorName}</div>
-                                  <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>{c.content}</div>
-                                </div>
+                                  <div style={{ background: 'var(--surface-lowest)', padding: '10px 14px', borderRadius: 16, borderTopLeftRadius: 4 }}>
+                                    <div style={{ fontWeight: 'bold', fontSize: 13, marginBottom: 2 }}>{c.authorName}</div>
+                                    <div style={{ fontSize: 14, color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>{c.content}</div>
+                                    
+                                    {c.media && c.media.length > 0 && (
+                                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+                                        {c.media.map((m, idx) => (
+                                          <div key={idx} style={{ maxWidth: '100%' }}>
+                                            {m.type === 'image' ? (
+                                              <img 
+                                                src={`${API.replace('/api', '')}${m.url}`} 
+                                                alt="comment attachment" 
+                                                style={{ maxWidth: '120px', borderRadius: 8, border: '1px solid var(--border)', cursor: 'pointer' }}
+                                                onClick={() => window.open(`${API.replace('/api', '')}${m.url}`, '_blank')}
+                                              />
+                                            ) : (
+                                              <a href={`${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', background: 'var(--bg-card2)', borderRadius: 8, fontSize: 11, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
+                                                <FileText size={14} color="#ef4444" />
+                                                <span style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                                              </a>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
                                 
                                 <div style={{ display: 'flex', gap: 12, marginTop: 4, paddingLeft: 8 }}>
                                   <button 
-                                    onClick={() => handleCommentLike(post.id, c.id)}
-                                    className="btn btn-ghost" 
                                     style={{ fontSize: 12, padding: '4px 8px', color: hasLikedComment ? '#ef4444' : 'var(--text-faint)' }}
                                   >
                                     <Heart size={12} fill={hasLikedComment ? '#ef4444' : 'none'} style={{ marginRight: 4 }} /> {c.likes?.length || 0}
@@ -437,8 +494,31 @@ export default function CommunityPage() {
                                                   {r.authorName}
                                                   {r.replyTo && <span style={{ color: 'var(--accent-purple)', fontSize: 11, marginLeft: 6, fontWeight: 'normal' }}>en réponse à {r.replyTo}</span>}
                                                 </div>
-                                                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{r.content}</div>
+                                                <div style={{ fontSize: 13, color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>{r.content}</div>
+                                                
+                                                {r.media && r.media.length > 0 && (
+                                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                                                    {r.media.map((m, idx) => (
+                                                      <div key={idx}>
+                                                        {m.type === 'image' ? (
+                                                          <img 
+                                                            src={`${API.replace('/api', '')}${m.url}`} 
+                                                            alt="reply attachment" 
+                                                            style={{ maxWidth: '100px', borderRadius: 6, border: '1px solid var(--border)', cursor: 'pointer' }}
+                                                            onClick={() => window.open(`${API.replace('/api', '')}${m.url}`, '_blank')}
+                                                          />
+                                                        ) : (
+                                                          <a href={`${API.replace('/api', '')}${m.url}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: 'var(--surface-lowest)', borderRadius: 6, fontSize: 10, textDecoration: 'none', color: 'var(--text)', border: '1px solid var(--border)' }}>
+                                                            <FileText size={12} color="#ef4444" />
+                                                            <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                                                          </a>
+                                                        )}
+                                                      </div>
+                                                    ))}
+                                                  </div>
+                                                )}
                                               </div>
+
                                               <div style={{ display: 'flex', gap: 8 }}>
                                                 <button 
                                                   onClick={() => handleReplyLike(post.id, c.id, r.id)}
@@ -458,27 +538,43 @@ export default function CommunityPage() {
 
                                               {/* Nested Reply Input */}
                                               {activeReplyId === r.id && (
-                                                <form 
-                                                  onSubmit={(e) => { e.preventDefault(); handleNestedReplySubmit(post.id, c.id, r.id); }}
-                                                  style={{ display: 'flex', gap: 8, marginTop: 12 }}
-                                                >
-                                                  <input 
-                                                    type="text" 
-                                                    placeholder={`Répondre à ${r.authorName}...`} 
-                                                    className="search-input"
-                                                    value={replyInputs[r.id] || ''}
-                                                    onChange={e => setReplyInputs({...replyInputs, [r.id]: e.target.value})}
-                                                    style={{ flex: 1, padding: '8px 12px', fontSize: 12, borderRadius: 20, background: 'var(--surface-lowest)' }}
-                                                  />
-                                                  <button 
-                                                    type="submit"
-                                                    disabled={!replyInputs[r.id]?.trim()}
-                                                    className="btn btn-ghost" 
-                                                    style={{ padding: '6px', color: 'var(--accent-purple)' }}
+                                                <div style={{ marginTop: 12 }}>
+                                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8, paddingLeft: 12 }}>
+                                                    {(replyPreviews[r.id] || []).map((p, i) => (
+                                                      <div key={i} style={{ position: 'relative' }}>
+                                                        {p.type === 'image' ? <img src={p.url} style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} /> : <FileText size={20} color="#ef4444" />}
+                                                        <button onClick={() => {
+                                                          const newF = [...replyFiles[r.id]]; newF.splice(i, 1); setReplyFiles({...replyFiles, [r.id]: newF});
+                                                          const newP = [...replyPreviews[r.id]]; newP.splice(i, 1); setReplyPreviews({...replyPreviews, [r.id]: newP});
+                                                        }} style={{ position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 14, height: 14, fontSize: 8 }}>X</button>
+                                                      </div>
+                                                    ))}
+                                                  </div>
+                                                  <form 
+                                                    onSubmit={(e) => { e.preventDefault(); handleNestedReplySubmit(post.id, c.id, r.id); }}
+                                                    style={{ display: 'flex', gap: 8, alignItems: 'center' }}
                                                   >
-                                                    <Send size={14} />
-                                                  </button>
-                                                </form>
+                                                    <input type="file" ref={el => replyFileInputRefs.current[r.id] = el} onChange={e => handleReplyFileChange(e, r.id)} style={{ display: 'none' }} multiple accept="image/*,application/pdf" />
+                                                    <button type="button" onClick={() => replyFileInputRefs.current[r.id]?.click()} className="btn btn-ghost" style={{ padding: 4 }}><ImageIcon size={14} /></button>
+                                                    <input 
+                                                      type="text" 
+                                                      placeholder={`Répondre à ${r.authorName}...`} 
+                                                      className="search-input"
+                                                      value={replyInputs[r.id] || ''}
+                                                      onChange={e => setReplyInputs({...replyInputs, [r.id]: e.target.value})}
+                                                      style={{ flex: 1, padding: '8px 12px', fontSize: 12, borderRadius: 20, background: 'var(--surface-lowest)' }}
+                                                    />
+                                                    <button 
+                                                      type="submit"
+                                                      disabled={isUploading || (!replyInputs[r.id]?.trim() && (!replyFiles[r.id] || replyFiles[r.id].length === 0))}
+                                                      className="btn btn-ghost" 
+                                                      style={{ padding: '6px', color: 'var(--accent-purple)' }}
+                                                    >
+                                                      <Send size={14} />
+                                                    </button>
+                                                  </form>
+                                                </div>
+
                                               )}
                                             </div>
                                           </div>
@@ -490,10 +586,24 @@ export default function CommunityPage() {
 
                                 {/* Comment Reply Input */}
                                 {activeReplyId === c.id && (
+                                <div style={{ marginTop: 12, paddingLeft: 12 }}>
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                                    {(replyPreviews[c.id] || []).map((p, i) => (
+                                      <div key={i} style={{ position: 'relative' }}>
+                                        {p.type === 'image' ? <img src={p.url} style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} /> : <FileText size={20} color="#ef4444" />}
+                                        <button onClick={() => {
+                                          const newF = [...replyFiles[c.id]]; newF.splice(i, 1); setReplyFiles({...replyFiles, [c.id]: newF});
+                                          const newP = [...replyPreviews[c.id]]; newP.splice(i, 1); setReplyPreviews({...replyPreviews, [c.id]: newP});
+                                        }} style={{ position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 14, height: 14, fontSize: 8 }}>X</button>
+                                      </div>
+                                    ))}
+                                  </div>
                                   <form 
                                     onSubmit={(e) => { e.preventDefault(); handleReplySubmit(post.id, c.id); }}
-                                    style={{ display: 'flex', gap: 8, marginTop: 12, paddingLeft: 12 }}
+                                    style={{ display: 'flex', gap: 8, alignItems: 'center' }}
                                   >
+                                    <input type="file" ref={el => replyFileInputRefs.current[c.id] = el} onChange={e => handleReplyFileChange(e, c.id)} style={{ display: 'none' }} multiple accept="image/*,application/pdf" />
+                                    <button type="button" onClick={() => replyFileInputRefs.current[c.id]?.click()} className="btn btn-ghost" style={{ padding: 6 }}><ImageIcon size={16} /></button>
                                     <input 
                                       type="text" 
                                       placeholder={`Répondre à ${c.authorName}...`} 
@@ -504,13 +614,15 @@ export default function CommunityPage() {
                                     />
                                     <button 
                                       type="submit"
-                                      disabled={!replyInputs[c.id]?.trim()}
+                                      disabled={isUploading || (!replyInputs[c.id]?.trim() && (!replyFiles[c.id] || replyFiles[c.id].length === 0))}
                                       className="btn btn-ghost" 
                                       style={{ padding: '8px', color: 'var(--accent-purple)' }}
                                     >
                                       <Send size={16} />
                                     </button>
                                   </form>
+                                </div>
+
                                 )}
                               </div>
                             </div>
@@ -519,42 +631,56 @@ export default function CommunityPage() {
                       })}
                     </div>
                   )}
-                  
-                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 12 }}>
-                    <div style={{
-                      width: 28, height: 28, borderRadius: '50%', background: 'var(--accent-grad)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
-                      fontWeight: 'bold', fontSize: 12, flexShrink: 0
-                    }}>
-                      {user.username.charAt(0).toUpperCase()}
+                             <div style={{ marginTop: 12 }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8, paddingLeft: 40 }}>
+                      {(commentPreviews[post.id] || []).map((p, i) => (
+                        <div key={i} style={{ position: 'relative' }}>
+                          {p.type === 'image' ? <img src={p.url} style={{ width: 50, height: 50, borderRadius: 6, objectFit: 'cover' }} /> : <FileText size={24} color="#ef4444" />}
+                          <button onClick={() => {
+                            const newF = [...commentFiles[post.id]]; newF.splice(i, 1); setCommentFiles({...commentFiles, [post.id]: newF});
+                            const newP = [...commentPreviews[post.id]]; newP.splice(i, 1); setCommentPreviews({...commentPreviews, [post.id]: newP});
+                          }} style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10 }}>X</button>
+                        </div>
+                      ))}
                     </div>
-                    <form 
-                      onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(post.id); }}
-                      style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'flex-end' }}
-                    >
-                      <textarea 
-                        placeholder="Write a comment..." 
-                        className="search-input"
-                        value={commentInputs[post.id] || ''}
-                        onChange={e => {
-                          setCommentInputs({...commentInputs, [post.id]: e.target.value});
-                          e.target.style.height = 'auto';
-                          e.target.style.height = e.target.scrollHeight + 'px';
-                        }}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleCommentSubmit(post.id);
-                          }
-                        }}
-                        style={{ flex: 1, padding: '10px 16px', borderRadius: 20, background: 'var(--surface-lowest)', border: '1px solid var(--border)', resize: 'none', height: 40, minHeight: 40, maxHeight: 120, overflowY: 'auto' }}
-                      />
-                      <button type="submit" disabled={!commentInputs[post.id]?.trim()} className="btn btn-ghost" style={{ padding: '10px', color: 'var(--accent-purple)' }}>
-                        <Send size={18} />
-                      </button>
-                    </form>
-
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                      <div style={{
+                        width: 28, height: 28, borderRadius: '50%', background: 'var(--accent-grad)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
+                        fontWeight: 'bold', fontSize: 12, flexShrink: 0
+                      }}>
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                      <form 
+                        onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(post.id); }}
+                        style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'flex-end' }}
+                      >
+                        <input type="file" ref={el => commentFileInputRefs.current[post.id] = el} onChange={e => handleCommentFileChange(e, post.id)} style={{ display: 'none' }} multiple accept="image/*,application/pdf" />
+                        <button type="button" onClick={() => commentFileInputRefs.current[post.id]?.click()} className="btn btn-ghost" style={{ padding: 8 }}><ImageIcon size={18} /></button>
+                        <textarea 
+                          placeholder="Write a comment..." 
+                          className="search-input"
+                          value={commentInputs[post.id] || ''}
+                          onChange={e => {
+                            setCommentInputs({...commentInputs, [post.id]: e.target.value});
+                            e.target.style.height = 'auto';
+                            e.target.style.height = e.target.scrollHeight + 'px';
+                          }}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                              e.preventDefault();
+                              handleCommentSubmit(post.id);
+                            }
+                          }}
+                          style={{ flex: 1, padding: '10px 16px', borderRadius: 20, background: 'var(--surface-lowest)', border: '1px solid var(--border)', resize: 'none', height: 40, minHeight: 40, maxHeight: 120, overflowY: 'auto' }}
+                        />
+                        <button type="submit" disabled={isUploading || (!commentInputs[post.id]?.trim() && (!commentFiles[post.id] || commentFiles[post.id].length === 0))} className="btn btn-ghost" style={{ padding: '10px', color: 'var(--accent-purple)' }}>
+                          <Send size={18} />
+                        </button>
+                      </form>
+                    </div>
                   </div>
+  </div>
                 </div>
               </div>
             );
