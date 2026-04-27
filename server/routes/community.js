@@ -44,9 +44,11 @@ router.get('/posts', authMiddleware, (req, res) => {
   res.json(posts);
 });
 
-router.post('/posts', authMiddleware, upload.single('media'), (req, res) => {
+router.post('/posts', authMiddleware, upload.array('media', 5), (req, res) => {
   const { content, tag } = req.body;
-  if (!content && !req.file) return res.status(400).json({ error: 'Content or media required' });
+  if (!content && (!req.files || req.files.length === 0)) {
+    return res.status(400).json({ error: 'Content or media required' });
+  }
 
   const posts = postsStore.load();
   const newPost = {
@@ -57,19 +59,23 @@ router.post('/posts', authMiddleware, upload.single('media'), (req, res) => {
     tag: tag || 'General',
     likes: [],
     comments: [],
+    media: [],
     timestamp: new Date().toISOString()
   };
 
-  if (req.file) {
-    newPost.mediaUrl = `/uploads/${req.file.filename}`;
-    newPost.mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'pdf';
-    newPost.mediaName = req.file.originalname;
+  if (req.files && req.files.length > 0) {
+    newPost.media = req.files.map(file => ({
+      url: `/uploads/${file.filename}`,
+      type: file.mimetype.startsWith('image/') ? 'image' : 'pdf',
+      name: file.originalname
+    }));
   }
 
   posts.unshift(newPost);
   postsStore.save(posts);
   res.json(newPost);
 });
+
 
 
 router.post('/posts/:id/like', authMiddleware, (req, res) => {

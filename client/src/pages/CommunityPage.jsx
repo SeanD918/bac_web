@@ -12,10 +12,11 @@ export default function CommunityPage() {
   const location = useLocation();
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [filePreview, setFilePreview] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
+
   const [commentInputs, setCommentInputs] = useState({});
 
   const [replyInputs, setReplyInputs] = useState({});
@@ -55,36 +56,38 @@ export default function CommunityPage() {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
 
     const allowed = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-    if (!allowed.includes(file.type)) {
-      alert('Only PDF and image files are allowed');
-      return;
+    const validFiles = files.filter(f => allowed.includes(f.type)).slice(0, 5);
+
+    if (validFiles.length < files.length) {
+      alert('Some files were ignored. Only images and PDFs are allowed (max 5 files).');
     }
 
-    setSelectedFile(file);
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => setFilePreview(reader.result);
-      reader.readAsDataURL(file);
-    } else {
-      setFilePreview('pdf');
-    }
+    setSelectedFiles(validFiles);
+    
+    const newPreviews = validFiles.map(file => {
+      if (file.type.startsWith('image/')) {
+        return { type: 'image', url: URL.createObjectURL(file) };
+      }
+      return { type: 'pdf', name: file.name };
+    });
+    setPreviews(newPreviews);
   };
 
   const handlePostSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (!newPost.trim() && !selectedFile) return;
+    if (!newPost.trim() && selectedFiles.length === 0) return;
     
     setIsUploading(true);
     try {
       const formData = new FormData();
       formData.append('content', newPost);
-      if (selectedFile) {
-        formData.append('media', selectedFile);
-      }
+      selectedFiles.forEach(file => {
+        formData.append('media', file);
+      });
 
       const res = await axios.post(`${API}/community/posts`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -92,8 +95,8 @@ export default function CommunityPage() {
       
       setPosts([res.data, ...posts]);
       setNewPost('');
-      setSelectedFile(null);
-      setFilePreview(null);
+      setSelectedFiles([]);
+      setPreviews([]);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (e) {
       console.error(e);
@@ -102,6 +105,8 @@ export default function CommunityPage() {
       setIsUploading(false);
     }
   };
+ bitumen
+
 
 
   const handleLike = async (postId) => {
@@ -205,27 +210,38 @@ export default function CommunityPage() {
               style={{ resize: 'vertical', minHeight: 80, padding: 16, background: 'var(--surface-lowest)' }}
             />
 
-            {filePreview && (
-              <div style={{ position: 'relative', width: 'fit-content', marginTop: 8 }}>
-                {filePreview === 'pdf' ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--bg-card2)', borderRadius: 8, border: '1px solid var(--border)' }}>
-                    <FileText size={24} color="#ef4444" />
-                    <span style={{ fontSize: 13, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedFile?.name}</span>
+            {previews.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 12 }}>
+                {previews.map((prev, idx) => (
+                  <div key={idx} style={{ position: 'relative', width: 'fit-content' }}>
+                    {prev.type === 'pdf' ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'var(--bg-card2)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                        <FileText size={24} color="#ef4444" />
+                        <span style={{ fontSize: 13, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prev.name}</span>
+                      </div>
+                    ) : (
+                      <img src={prev.url} alt="Preview" style={{ width: '100px', height: '100px', borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border)' }} />
+                    )}
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const newFiles = [...selectedFiles];
+                        newFiles.splice(idx, 1);
+                        setSelectedFiles(newFiles);
+                        const newPrevs = [...previews];
+                        newPrevs.splice(idx, 1);
+                        setPreviews(newPrevs);
+                      }}
+                      style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <X size={12} />
+                    </button>
                   </div>
-                ) : (
-                  <img src={filePreview} alt="Preview" style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border)' }} />
-                )}
-                <button 
-                  type="button"
-                  onClick={() => { setSelectedFile(null); setFilePreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                  style={{ position: 'absolute', top: -10, right: -10, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  <X size={14} />
-                </button>
+                ))}
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
               <div>
                 <input 
                   type="file" 
@@ -233,13 +249,14 @@ export default function CommunityPage() {
                   onChange={handleFileChange} 
                   accept="image/*,application/pdf" 
                   style={{ display: 'none' }} 
+                  multiple
                 />
                 <button 
                   type="button" 
                   onClick={() => fileInputRef.current?.click()}
                   className="btn btn-ghost"
                   style={{ color: 'var(--text-muted)', padding: '8px' }}
-                  title="Add Image or PDF"
+                  title="Add Images or PDFs (Max 5)"
                 >
                   <ImageIcon size={20} style={{ marginRight: 6 }} />
                   <span style={{ fontSize: 13 }}>Media</span>
@@ -248,13 +265,14 @@ export default function CommunityPage() {
               <button 
                 type="submit" 
                 className="btn btn-primary" 
-                disabled={isUploading || (!newPost.trim() && !selectedFile)}
+                disabled={isUploading || (!newPost.trim() && selectedFiles.length === 0)}
                 style={{ padding: '8px 24px' }}
               >
                 {isUploading ? 'Posting...' : <><Send size={16} /> Post</>}
               </button>
             </div>
           </form>
+
 
         </div>
 
@@ -303,36 +321,46 @@ export default function CommunityPage() {
                   )}
                 </div>
 
-                <p style={{ marginBottom: post.mediaUrl ? 16 : 24, fontSize: 15, lineHeight: 1.6, color: 'var(--text)' }}>
+                <p style={{ marginBottom: (post.media && post.media.length > 0) ? 16 : 24, fontSize: 15, lineHeight: 1.6, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
                   {post.content}
                 </p>
 
-                {post.mediaUrl && (
-                  <div style={{ marginBottom: 24 }}>
-                    {post.mediaType === 'image' ? (
-                      <img 
-                        src={`${API.replace('/api', '')}${post.mediaUrl}`} 
-                        alt="Post attachment" 
-                        style={{ maxWidth: '100%', borderRadius: 12, border: '1px solid var(--border)', cursor: 'pointer' }}
-                        onClick={() => window.open(`${API.replace('/api', '')}${post.mediaUrl}`, '_blank')}
-                      />
-                    ) : (
-                      <a 
-                        href={`${API.replace('/api', '')}${post.mediaUrl}`} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="card"
-                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'var(--surface-lowest)', textDecoration: 'none', border: '1px solid var(--border)' }}
-                      >
-                        <FileText size={32} color="#ef4444" />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 'bold', color: 'var(--text)', fontSize: 14 }}>{post.mediaName || 'PDF Document'}</div>
-                          <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Click to view document</div>
-                        </div>
-                      </a>
-                    )}
+                {post.media && post.media.length > 0 && (
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: post.media.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))', 
+                    gap: 12, 
+                    marginBottom: 24 
+                  }}>
+                    {post.media.map((m, idx) => (
+                      <div key={idx}>
+                        {m.type === 'image' ? (
+                          <img 
+                            src={`${API.replace('/api', '')}${m.url}`} 
+                            alt={`Attachment ${idx + 1}`} 
+                            style={{ width: '100%', borderRadius: 12, border: '1px solid var(--border)', cursor: 'pointer', objectFit: 'cover', height: post.media.length > 1 ? '200px' : 'auto' }}
+                            onClick={() => window.open(`${API.replace('/api', '')}${m.url}`, '_blank')}
+                          />
+                        ) : (
+                          <a 
+                            href={`${API.replace('/api', '')}${m.url}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="card"
+                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: 'var(--surface-lowest)', textDecoration: 'none', border: '1px solid var(--border)', height: '100%' }}
+                          >
+                            <FileText size={32} color="#ef4444" />
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontWeight: 'bold', color: 'var(--text)', fontSize: 14 }}>{m.name || 'PDF Document'}</div>
+                              <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>View Document</div>
+                            </div>
+                          </a>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
+
 
                 
                 <div style={{ display: 'flex', gap: 16, marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
@@ -502,20 +530,30 @@ export default function CommunityPage() {
                     </div>
                     <form 
                       onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(post.id); }}
-                      style={{ flex: 1, display: 'flex', gap: 8 }}
+                      style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'flex-end' }}
                     >
-                      <input 
-                        type="text" 
+                      <textarea 
                         placeholder="Write a comment..." 
                         className="search-input"
                         value={commentInputs[post.id] || ''}
-                        onChange={e => setCommentInputs({...commentInputs, [post.id]: e.target.value})}
-                        style={{ flex: 1, padding: '10px 16px', borderRadius: 20, background: 'var(--surface-lowest)', border: '1px solid var(--border)' }}
+                        onChange={e => {
+                          setCommentInputs({...commentInputs, [post.id]: e.target.value});
+                          e.target.style.height = 'auto';
+                          e.target.style.height = e.target.scrollHeight + 'px';
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleCommentSubmit(post.id);
+                          }
+                        }}
+                        style={{ flex: 1, padding: '10px 16px', borderRadius: 20, background: 'var(--surface-lowest)', border: '1px solid var(--border)', resize: 'none', height: 40, minHeight: 40, maxHeight: 120, overflowY: 'auto' }}
                       />
-                      <button type="submit" disabled={!commentInputs[post.id]?.trim()} className="btn btn-ghost" style={{ padding: '8px', color: 'var(--accent-purple)' }}>
+                      <button type="submit" disabled={!commentInputs[post.id]?.trim()} className="btn btn-ghost" style={{ padding: '10px', color: 'var(--accent-purple)' }}>
                         <Send size={18} />
                       </button>
                     </form>
+
                   </div>
                 </div>
               </div>

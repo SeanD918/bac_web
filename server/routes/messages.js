@@ -53,12 +53,14 @@ router.get('/:userId', authMiddleware, (req, res) => {
 });
 
 // Send a message
-router.post('/:userId', authMiddleware, upload.single('media'), (req, res) => {
+router.post('/:userId', authMiddleware, upload.array('media', 5), (req, res) => {
   const targetUserId = req.params.userId;
   const currentUserId = req.user.id;
   const { content } = req.body;
 
-  if (!content && !req.file) return res.status(400).json({ error: 'Message content or media required' });
+  if (!content && (!req.files || req.files.length === 0)) {
+    return res.status(400).json({ error: 'Message content or media required' });
+  }
 
   const allMessages = messagesStore.load();
   const newMessage = {
@@ -66,13 +68,16 @@ router.post('/:userId', authMiddleware, upload.single('media'), (req, res) => {
     senderId: currentUserId,
     receiverId: targetUserId,
     content: content || '',
+    media: [],
     timestamp: new Date().toISOString()
   };
 
-  if (req.file) {
-    newMessage.mediaUrl = `/uploads/${req.file.filename}`;
-    newMessage.mediaType = req.file.mimetype.startsWith('image/') ? 'image' : 'pdf';
-    newMessage.mediaName = req.file.originalname;
+  if (req.files && req.files.length > 0) {
+    newMessage.media = req.files.map(file => ({
+      url: `/uploads/${file.filename}`,
+      type: file.mimetype.startsWith('image/') ? 'image' : 'pdf',
+      name: file.originalname
+    }));
   }
 
   allMessages.push(newMessage);
@@ -80,6 +85,7 @@ router.post('/:userId', authMiddleware, upload.single('media'), (req, res) => {
 
   res.json(newMessage);
 });
+
 
 
 module.exports = router;
