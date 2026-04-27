@@ -24,7 +24,6 @@ function getStore(filename) {
     }
   }
 
-  console.log(`[BacWeb Store] Using file path: ${path.resolve(filePath)}`);
 
   function load() {
     try {

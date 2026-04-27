@@ -31,19 +31,13 @@ router.post('/register', (req, res) => {
 
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
-  console.log(`[Auth] Login attempt for username: "${username}"`);
-  
   const users = usersStore.load();
-  console.log(`[Auth] Loaded ${users.length} users from store.`);
-  
   const user = users.find(u => u.username === username && u.password === password);
-  
+
   if (!user) {
-    console.log(`[Auth] Login failed. Invalid credentials for "${username}".`);
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
-  console.log(`[Auth] Login successful for "${username}".`);
   res.json({ token: user.token, user: { id: user.id, username: user.username, following: user.following, followers: user.followers } });
 });
 
@@ -89,7 +83,6 @@ router.post('/follow/:id', authMiddleware, (req, res) => {
       const { createNotification } = require('./notifications');
       createNotification(targetId, currentUser.username, 'FOLLOW', null);
     } catch (e) {
-      console.error('Failed to create follow notification:', e);
     }
   }
 
