@@ -6,9 +6,9 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build client",
     "start-server": "node server/index.js",
-    "dev": "concurrently \"nodemon server/index.js\" \"vite\""
+    "dev": "concurrently \"nodemon server/index.js\" \"vite client\""
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.3",

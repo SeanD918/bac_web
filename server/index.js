@@ -46,6 +46,21 @@ app.get('/api/health', (req, res) => {
 });
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
+// Root route helper for developers
+app.get('/', (req, res) => {
+  if (!process.env.VERCEL) {
+    res.send(`
+      <div style="font-family: sans-serif; padding: 40px; text-align: center;">
+        <h1 style="color: #6366f1;">BacWeb API is Running</h1>
+        <p>This is the backend server (Port 3001).</p>
+        <p>To view the website, go to: <a href="http://localhost:5173" style="color: #8b5cf6; font-weight: bold; font-size: 1.2em;">http://localhost:5173</a></p>
+      </div>
+    `);
+  } else {
+    res.json({ message: "BacWeb API is active." });
+  }
+});
+
 // Mount both with and without /api prefix for maximum compatibility on Vercel
 app.use('/api', examRoutes);
 app.use('/api', uploadRoutes);
