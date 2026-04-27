@@ -123,6 +123,25 @@ export default function CommunityPage() {
     }
   };
 
+  const handleCommentLike = async (postId, commentId) => {
+    try {
+      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/like`);
+      setPosts(posts.map(p => p.id === postId ? res.data : p));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleReplyLike = async (postId, commentId, replyId) => {
+    try {
+      const res = await axios.post(`${API}/community/posts/${postId}/comments/${commentId}/replies/${replyId}/like`);
+      setPosts(posts.map(p => p.id === postId ? res.data : p));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+
   const handleCommentFileChange = (e, postId) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -420,7 +439,9 @@ export default function CommunityPage() {
                   {post.comments.length > 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 16 }}>
                       {post.comments.map(c => {
+                        const hasLikedComment = c.likes?.includes(user.id);
                         return (
+
                           <div key={c.id} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             <div style={{ display: 'flex', gap: 12 }}>
                               <div style={{
@@ -460,10 +481,13 @@ export default function CommunityPage() {
                                 
                                 <div style={{ display: 'flex', gap: 12, marginTop: 4, paddingLeft: 8 }}>
                                   <button 
+                                    onClick={() => handleCommentLike(post.id, c.id)}
+                                    className="btn btn-ghost" 
                                     style={{ fontSize: 12, padding: '4px 8px', color: hasLikedComment ? '#ef4444' : 'var(--text-faint)' }}
                                   >
                                     <Heart size={12} fill={hasLikedComment ? '#ef4444' : 'none'} style={{ marginRight: 4 }} /> {c.likes?.length || 0}
                                   </button>
+
                                   <button 
                                     onClick={() => setActiveReplyId(activeReplyId === c.id ? null : c.id)}
                                     className="btn btn-ghost" 
@@ -544,9 +568,10 @@ export default function CommunityPage() {
                                                       <div key={i} style={{ position: 'relative' }}>
                                                         {p.type === 'image' ? <img src={p.url} style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} /> : <FileText size={20} color="#ef4444" />}
                                                         <button onClick={() => {
-                                                          const newF = [...replyFiles[r.id]]; newF.splice(i, 1); setReplyFiles({...replyFiles, [r.id]: newF});
-                                                          const newP = [...replyPreviews[r.id]]; newP.splice(i, 1); setReplyPreviews({...replyPreviews, [r.id]: newP});
+                                                          const newF = [...(replyFiles[r.id] || [])]; newF.splice(i, 1); setReplyFiles({...replyFiles, [r.id]: newF});
+                                                          const newP = [...(replyPreviews[r.id] || [])]; newP.splice(i, 1); setReplyPreviews({...replyPreviews, [r.id]: newP});
                                                         }} style={{ position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 14, height: 14, fontSize: 8 }}>X</button>
+
                                                       </div>
                                                     ))}
                                                   </div>
@@ -592,9 +617,10 @@ export default function CommunityPage() {
                                       <div key={i} style={{ position: 'relative' }}>
                                         {p.type === 'image' ? <img src={p.url} style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover' }} /> : <FileText size={20} color="#ef4444" />}
                                         <button onClick={() => {
-                                          const newF = [...replyFiles[c.id]]; newF.splice(i, 1); setReplyFiles({...replyFiles, [c.id]: newF});
-                                          const newP = [...replyPreviews[c.id]]; newP.splice(i, 1); setReplyPreviews({...replyPreviews, [c.id]: newP});
+                                          const newF = [...(replyFiles[c.id] || [])]; newF.splice(i, 1); setReplyFiles({...replyFiles, [c.id]: newF});
+                                          const newP = [...(replyPreviews[c.id] || [])]; newP.splice(i, 1); setReplyPreviews({...replyPreviews, [c.id]: newP});
                                         }} style={{ position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 14, height: 14, fontSize: 8 }}>X</button>
+
                                       </div>
                                     ))}
                                   </div>
@@ -637,9 +663,10 @@ export default function CommunityPage() {
                         <div key={i} style={{ position: 'relative' }}>
                           {p.type === 'image' ? <img src={p.url} style={{ width: 50, height: 50, borderRadius: 6, objectFit: 'cover' }} /> : <FileText size={24} color="#ef4444" />}
                           <button onClick={() => {
-                            const newF = [...commentFiles[post.id]]; newF.splice(i, 1); setCommentFiles({...commentFiles, [post.id]: newF});
-                            const newP = [...commentPreviews[post.id]]; newP.splice(i, 1); setCommentPreviews({...commentPreviews, [post.id]: newP});
+                            const newF = [...(commentFiles[post.id] || [])]; newF.splice(i, 1); setCommentFiles({...commentFiles, [post.id]: newF});
+                            const newP = [...(commentPreviews[post.id] || [])]; newP.splice(i, 1); setCommentPreviews({...commentPreviews, [post.id]: newP});
                           }} style={{ position: 'absolute', top: -8, right: -8, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%', width: 18, height: 18, fontSize: 10 }}>X</button>
+
                         </div>
                       ))}
                     </div>
@@ -680,7 +707,6 @@ export default function CommunityPage() {
                       </form>
                     </div>
                   </div>
-  </div>
                 </div>
               </div>
             );
